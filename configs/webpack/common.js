@@ -2,12 +2,14 @@
 const {resolve} = require('path');
 const {CheckerPlugin} = require('awesome-typescript-loader');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const uglify = require('uglifyjs-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
   },
-  context: resolve(__dirname, '../../src'),
+  // context: resolve(__dirname, '../../src'),
   module: {
     rules: [
       {
@@ -41,8 +43,15 @@ module.exports = {
     ],
   },
   plugins: [
+    new CleanWebpackPlugin(['dist']),
     new CheckerPlugin(),
-    new HtmlWebpackPlugin({template: 'index.html.ejs',}),
+    new HtmlWebpackPlugin({
+        template: resolve(__dirname, '../../src/index.html.ejs'),
+        minify: {
+          collapseWhitespace: true
+        }
+    }),
+    new uglify()
   ],
   externals: {
     'react': 'React',

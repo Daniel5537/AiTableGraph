@@ -220,8 +220,8 @@ export class VisualNode extends EventDispatcher implements IVisualNode, IDataRen
 
     public updateReleatedEdges(): void {
         for (let edge of this.vedges) {
-            if (edge.edgeView != null)
-                ((edge as IVisualEdge).edgeView).render(false);
+            // if (edge.edgeView != null)
+                // ((edge as IVisualEdge).edgeView).render(false);
         }
     }
 

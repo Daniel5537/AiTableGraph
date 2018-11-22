@@ -3,7 +3,7 @@ const merge = require('webpack-merge');
 const webpack = require('webpack');
 const commonConfig = require('./common');
 
-function resolve(relatedPath) {
+exports.resolve =  function (relatedPath) {
     return path.join(__dirname, relatedPath)
 }
 
