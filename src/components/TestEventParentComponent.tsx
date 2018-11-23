@@ -68,7 +68,7 @@ export class TestEventParentComponent extends DecathlonComponent {
         let viewDict: Map<string, any> = new Map<string, any>();
         viewDict.set("view", n1);
         viewDict.set("data", {"data bbibibibi": 30});
-        viewDict.set("props", {"getEntity": (testEntity) => {this.testcom = testEntity; }});
+        viewDict.set("getEntity", (testEntity) => {this.testcom = testEntity; });
         // (n1 as TestEventComponent).data = {"data bbibibibi": 30};
         testfact.push(viewDict);
         // testfact.push(n2);
@@ -86,8 +86,9 @@ export class TestEventParentComponent extends DecathlonComponent {
                     this.state["children"].map((item, key) => {
                         const ChildrenComponent = (item as Map<string, any>).get("view");
                         const viewData = (item as Map<string, any>).get("data");
+                        const tmpGetEntity = (item as Map<string, any>).get("getEntity");
                         // const ChildrenComponent = (item as IComponentFactory).newInstance();
-                        return < ChildrenComponent key={key} data={viewData}/>;
+                        return < ChildrenComponent key={key} data={viewData} getEntity={tmpGetEntity}/>;
                     })
                 }
                 <button onClick={this.onBtnClick}>hihihi</button>
