@@ -1,6 +1,7 @@
 import {IDog} from "./IDog";
-import {IObjectConstructor} from "../workflow/global/IObjectConstructor";
-
+// import {IObjectConstructor} from "../workflow/global/IObjectConstructor";
+import {sayHi} from "./Cat";
+sayHi()
 export class Dog implements IDog {
     public name: string;
     public age: number;

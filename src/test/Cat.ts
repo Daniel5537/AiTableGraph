@@ -11,3 +11,7 @@ export class Cat {
         console.log(this.name);
     }
 }
+
+export let sayHi = function(): void {
+    console.log("hello");
+}
