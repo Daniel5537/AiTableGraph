@@ -10,8 +10,16 @@ import {BaseEdgeRenderer} from "./edgeRenderers/BaseEdgeRenderer";
 import {IGraph} from "../data/IGraph";
 import {ILayoutAlgorithm} from "../layout/ILayoutAlgorithm";
 import {INode} from "../data/INode";
+import {DecathlonLable} from "../../../workflow/components/DecathlonLable";
+import * as React from "react";
+import {IDataRenderer} from "../../../base/IDataRenderer";
+import {IEdgeRenderer} from "./IEdgeRenderer";
 
 export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
+    private _nodeEntityViews: Array<any> = [];
+    private _edgeEntityViews: Array<any> = [];
+    private _nodeLabelEntityViews: Array<any> = [];
+    private _edgeLabelEntityViews: Array<any> = [];
     protected _drag_x_offsetMap: Map<DecathlonComponent, number>;
     protected _drag_y_offsetMap: Map<DecathlonComponent, number>;
     protected _drag_boundsMap: Map<any, any>;
@@ -28,12 +36,18 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
     protected _visibilityLimitActive: boolean = true;
     protected _currentVNodeHistory: Array<any> = null;
     protected _edgeRendererFactory: IFactory = null;
+    protected _edgeRenderer: IEdgeRenderer = null;
     protected _origin: Point;
     protected _graph: IGraph = null;
     protected _layouter: ILayoutAlgorithm;
     protected _currentRootVNode: IVisualNode = null;
     protected _canvas: DecathlonCanvas;
-    protected _displayEdgeLabels:boolean = false;
+    protected _displayEdgeLabels: boolean = false;
+    protected _edgeLabelRendererFactory: IFactory = null;
+    protected _viewToVEdgeMap: Map<DecathlonComponent, IVisualEdge>;
+    protected _nodeIDsWithinDistanceLimit: Map<IVisualNode, IVisualNode>;
+    protected _prevNodeIDsWithinDistanceLimit: Map<IVisualNode, IVisualNode>;
+    protected _noNodesWithinDistance: number;
 
     public _defaultDragBackBound: boolean = true;
     public _displayMouseWheel: boolean = false;
@@ -52,6 +66,7 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
         this._visibleVNodesList = [];
         this._visibleVEdges = new Map<IVisualEdge, IVisualEdge>();
         this._visibleVEdgesList = [];
+        this._viewToVEdgeMap = new Map<DecathlonComponent, IVisualEdge>();
         this._noVisibleVNodes = 0;
         this._visibilityLimitActive = true;
         this._currentVNodeHistory = [];
@@ -61,6 +76,12 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
         // this.clipContent = true;
 
         this._origin = new Point(0, 0);
+        this.state = {
+            nodeChildren: [],
+            nodeLabelChildren: [],
+            edgeChildren: [],
+            edgeLabelChildren: []
+        };
     }
 
     public set graph(g: IGraph) {
@@ -73,9 +94,10 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
             if (this._layouter != null) {
                 this._layouter.resetAll();
             }
-            _nodeIDsWithinDistanceLimit = null;
-            _prevNodeIDsWithinDistanceLimit = null;
-            _noNodesWithinDistance = 0;
+
+            this._nodeIDsWithinDistanceLimit = null;
+            this._prevNodeIDsWithinDistanceLimit = null;
+            this._noNodesWithinDistance = 0;
         }
 
         this._graph = g;
@@ -126,68 +148,75 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
     }
 
     protected createVEdgeView(ve: IVisualEdge): DecathlonComponent {
-        let mycomponent: DecathlonComponent = null;
-        if (ve.data["is_show_name"] == 1 ) {
+        let mycomponent: DecathlonLable = null;
+        if (ve.data["is_show_name"] === 1 ) {
             if (this._edgeLabelRendererFactory != null) {
                 mycomponent = this._edgeLabelRendererFactory.newInstance();
             } else {
-                mycomponent = new Label;
-                mycomponent.setStyle("textAlign","center");
-                if (ve.data.font_color!=null&&ve.data.font_color!=""){
-                    mycomponent.setStyle("color",ve.data.font_color);
-                }
-                mycomponent.buttonMode = true ;
-                mycomponent.setStyle("useHandCursor",true);
-                mycomponent.mouseChildren=false;
-                if(ve.data != null&&this._displayEdgeLabels) {
-                    if(ve.data.edgelabel !=null){
-                        (mycomponent as Label).text = ve.data.edgelabel;
-                    }else{
-                        (mycomponent as Label).text ="link";
+                mycomponent = new DecathlonLable(null, null);
+                // mycomponent.setStyle("textAlign", "center");
+                // if (ve.data.font_color!=null && ve.data.font_color!=""){
+                //     mycomponent.setStyle("color", ve.data.font_color);
+                // }
+                // mycomponent.buttonMode = true ;
+                // mycomponent.setStyle("useHandCursor", true);
+                // mycomponent.mouseChildren=false;
+                if (ve.data != null && this._displayEdgeLabels) {
+                    if (ve.data["edgelabel"] != null) {
+                        (mycomponent as DecathlonLable).text = ve.data["edgelabel"];
+                    } else {
+                        (mycomponent as DecathlonLable).text = "link";
                     }
-                    mycomponent.toolTip= ve.data.edgelabel;
-                    //	mycomponent.doubleClickEnabled = true;
-                    //	mycomponent.addEventListener(MouseEvent.CLICK,onLineClick);
+                    // mycomponent.toolTip= ve.data.edgelabel;
+                    // mycomponent.doubleClickEnabled = true;
+                    // mycomponent.addEventListener(MouseEvent.CLICK,onLineClick);
                 }
             }
 
-            /* assigns the edge to the IDataRenderer part of the view
-             * this is important to access the data object of the VEdge
-             * which contains information for rendering. */
-            if(mycomponent is IDataRenderer) {
+            if (mycomponent["data"]) {
                 (mycomponent as IDataRenderer).data = ve;
             }
 
-            var vn:IVisualNode;
-            var count:Number=0;
-            for each(vn in _visibleVNodes) {
+            let vn: IVisualNode;
+            let count: number = 0;
+            for (vn of this._visibleVNodes.values()) {
                 count++;
             }
 
-            /* add the component to its parent component
-             * this can create problems, we have to see where we
-             * check for all children
-             * Add after the edges layer, but below all other elements such as nodes */
-            _canvas.addChildAt(mycomponent, count);
+            // _canvas.addChildAt(mycomponent, count);
+            this._edgeLabelEntityViews.push(mycomponent);
 
             ve.labelView = mycomponent;
-            _viewToVEdgeMap[mycomponent] = ve;
+            this._viewToVEdgeMap.set(mycomponent, ve);
 
-            /* set initial default x/y values, these should be in the middle of the
-             * edge, but depending on the edge renderer. Thus we should ask
-             * the edge renderer, where it wants to place the label. This would
-             * be a new method for the edge renderer interface */
-            if(_edgeRenderer != null) {
-                ve.setEdgeLabelCoordinates(_edgeRenderer.labelCoordinates(ve));
+            if (this._edgeRenderer != null) {
+                ve.setEdgeLabelCoordinates(this._edgeRenderer.labelCoordinates(ve));
             } else {
-                ve.setEdgeLabelCoordinates(new Point(_canvas.width / 2.0, _canvas.height / 2.0));
+                ve.setEdgeLabelCoordinates(new Point(this._canvas.width / 2.0, this._canvas.height / 2.0));
             }
 
             /* we need to invalidate the display list since
              * we created new children */
-            refresh();
+            // refresh();
         }
         return mycomponent;
+    }
+
+    protected removeVEdgeView(component: DecathlonComponent): void {
+
+        let ve: IVisualEdge;
+
+        if (component.props.owner != null) {
+            component.props.owner.removeChild(component);
+        }
+
+        ve = this._viewToVEdgeMap.get(component);
+        ve.labelView = null;
+        this._viewToVEdgeMap.delete(component);
+
+        // --_componentCounter;
+
+        // trace("removed component from node:"+vn.id);
     }
 
     public removeVEdge(ve: IVisualEdge): void {
@@ -217,6 +246,40 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
         }
 
         this._vnodes.delete(vn);
+    }
+
+    // 动效后续处理，先默认为false
+    protected removeComponent(component: DecathlonComponent, honorEffect: boolean = false): void {
+
+        let vn: IVisualNode;
+
+        // 动效后续处理
+        // if (honorEffect && (removeItemEffect != null)) {
+        //     removeItemEffect.addEventListener(EffectEvent.EFFECT_END,
+        //         removeEffectDone);
+        //     removeItemEffect.createInstance(component).startEffect();
+        // } else {
+            /* remove the component from it's parent (which should be the canvas) */
+            if (component.props.owner != null) {
+                component.props.owner.removeChild(component);
+            }
+
+            /* remove event mouse listeners */
+            // component.removeEventListener(MouseEvent.DOUBLE_CLICK,nodeDoubleClick);
+            // component.removeEventListener(MouseEvent.MOUSE_DOWN,nodeMouseDown);
+            // component.removeEventListener(MouseEvent.MOUSE_UP, dragEnd);
+
+            /* get the associated VNode and remove the view from it
+             * and also remove the map entry */
+            vn = _viewToVNodeMap[component];
+            vn.view = null;
+            delete _viewToVNodeMap[component];
+
+            /* decreate component counter */
+            --_componentCounter;
+
+            //trace("removed component from node:"+vn.id);
+        // }
     }
 
     public setEdgeVisibility(ve: IVisualEdge, visible: boolean): void {
@@ -348,4 +411,36 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
     unlinkNodes(v1: IVisualNode, v2: IVisualNode): void {
     }
 
+    render() {
+        return(
+            <div id="vgraph">
+                {
+                    this.state["edgeLabelChildren"].map((item, key) => {
+                        const EdgeLabelChildrenComponent = item;
+                        return < EdgeLabelChildrenComponent key={key} />;
+                    })
+                }
+                <svg id="edgeSvg">
+                    {
+                        this.state["edgeChildren"].map((item, key) => {
+                            const EdgeChildrenComponent = item;
+                            return < EdgeChildrenComponent key={key} />;
+                        })
+                    }
+                </svg>
+                {
+                    this.state["nodeLabelChildren"].map((item, key) => {
+                        const NodeLabelChildren = item;
+                        return < NodeLabelChildren key={key} />;
+                    })
+                }
+                {
+                    this.state["nodeChildren"].map((item, key) => {
+                        const NodeChildrenComponent = item;
+                        return < NodeChildrenComponent key={key} />;
+                    })
+                }
+            </div>
+        )
+    }
 }

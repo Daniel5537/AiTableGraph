@@ -2,6 +2,7 @@ import * as React from "react";
 import {EventBase} from "../events/EventBase";
 import {IEventDispatcher} from "../events/IEventDispatcher";
 import {EventDispatcher} from "../events/EventDispatcher";
+import {IDataRenderer} from "../../base/IDataRenderer";
 
 export interface IDecathlonEventDispatcher {
     componentEventBus: IEventDispatcher;
@@ -19,9 +20,10 @@ export interface IDecathlonComponentProps {
     y?: number;
     visible?: boolean;
     position?: string;
+    data?: object;
 }
 
-export class DecathlonComponent extends React.Component<IDecathlonComponentProps, {}> implements IDecathlonEventDispatcher {
+export class DecathlonComponent extends React.Component<IDecathlonComponentProps, {}> implements IDecathlonEventDispatcher, IDataRenderer {
     private _visible: boolean = true;
     private _styleObj: object = {};
     private _width: number;
@@ -29,6 +31,7 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
     private _x: number;
     private _y: number;
     private _position: string;
+    private _data: object;
     // private _minWidth: number;
     // private _minHeight: number;
     // private _maxWidth: number;
@@ -36,9 +39,11 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
 
     constructor(props, context) {
         super(props, context);
-        const { getEntity } = props;
-        if (typeof getEntity === "function") {
-            getEntity(this);
+        if (this.props) {
+            const { getEntity } = props;
+            if (typeof getEntity === "function") {
+                getEntity(this);
+            }
         }
 
         this.state = {
@@ -50,6 +55,14 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
         let cloneStyleObj: object = Object.assign({}, this._styleObj);
         cloneStyleObj[key] = value;
         this._styleObj = cloneStyleObj;
+    }
+
+    public set data(value: object) {
+        this._data = value;
+    }
+
+    public get data(): object {
+        return this._data;
     }
 
     public set y(value: number) {
@@ -157,6 +170,8 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
             this._styleObj["width"] = this.props.width;
         if (this.props.height)
             this._styleObj["height"] = this.props.height;
+        if (this.props.data)
+            this._data = this.props.data;
     }
 
     entityAddEventListener(type: string, listener: Function, context: any) {
@@ -177,4 +192,6 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
     entityRemoveEventListener(type: string, context: any): void {
         this.componentEventBus.removeEventListener(type, context);
     }
+
+    public removeChild(child: DecathlonComponent): void {}
 }

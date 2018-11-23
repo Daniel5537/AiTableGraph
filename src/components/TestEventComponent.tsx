@@ -2,7 +2,7 @@ import * as React from "react";
 import {DecathlonComponent} from "../workflow/components/DecathlonComponent";
 import {PersonEvent} from "../events/PersonEvent";
 
-export class TestEventComponent extends DecathlonComponent {
+export default class TestEventComponent extends DecathlonComponent {
     constructor(props, context) {
         super(props, context);
     }
@@ -23,6 +23,10 @@ export class TestEventComponent extends DecathlonComponent {
 
     parentCall = () => {
         console.log("父节点call");
+    }
+
+    public printData = () => {
+        console.log(this.data);
     }
 
     render() {
