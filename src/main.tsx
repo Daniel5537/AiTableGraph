@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import {TestEventGrandFatherComponent} from "./components/TestEventGrandFatherComponent"
+import {TestEventGrandFatherComponent} from "./components/TestEventGrandFatherComponent";
 
 ReactDOM.render(
     <TestEventGrandFatherComponent/>,
