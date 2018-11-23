@@ -33,7 +33,6 @@ export class TestEventGrandFatherComponent extends DecathlonComponent {
         // }
         let iftest: IFactory = new ClassFactory(Cat);
         let cat1: Cat = iftest.newInstance();
-        cat1.name = "cat look";
         cat1.say();
     }
 
