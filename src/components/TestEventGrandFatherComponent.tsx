@@ -31,9 +31,9 @@ export class TestEventGrandFatherComponent extends DecathlonComponent {
         // for (let i of tmap1.keys()){
         //     console.log(i);
         // }
-        let iftest: IFactory = new ClassFactory(Cat);
-        let cat1: Cat = iftest.newInstance();
-        cat1.say();
+        // let iftest: IFactory = new ClassFactory(Cat);
+        // let cat1: Cat = iftest.newInstance();
+        // cat1.say();
     }
 
     render() {

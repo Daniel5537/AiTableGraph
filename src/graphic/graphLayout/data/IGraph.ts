@@ -23,7 +23,7 @@ export interface IGraph extends IEventDispatcher {
 
     removeNode(n: INode): void;
 
-    getTree(n: INode, restr: boolean, nocache: boolean, direction: number): IGTree;
+    getTree(n: INode, restr: boolean, nocache: boolean): IGTree;
 
     purgeTrees(): void;
 

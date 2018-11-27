@@ -15,9 +15,9 @@ export interface IVisualGraph extends IEventDispatcher {
     layouter: ILayoutAlgorithm;
     origin: Point;
     center: Point;
-    visibleVNodes: Array<any>;
+    visibleVNodes: Map<IVisualNode, IVisualNode>;
     noVisibleVNodes: number;
-    visibleVEdges: Array<any>;
+    visibleVEdges: Map<IVisualEdge, IVisualEdge>;
     showHistory: boolean;
     currentRootVNode: IVisualNode;
     visibilityLimitActive: boolean;

@@ -67,9 +67,7 @@ export class TestEventParentComponent extends DecathlonComponent {
         // let n2: any = t2.newInstance();
         let viewDict: Map<string, any> = new Map<string, any>();
         viewDict.set("view", n1);
-        viewDict.set("data", {"data bbibibibi": 30});
-        viewDict.set("getEntity", (testEntity) => {this.testcom = testEntity; });
-        // (n1 as TestEventComponent).data = {"data bbibibibi": 30};
+        viewDict.set("props", {"data": {"data bbibibibi": 30}, "getEntity": (testEntity) => {this.testcom = testEntity; }});
         testfact.push(viewDict);
         // testfact.push(n2);
         this.setState({children: testfact});
@@ -77,6 +75,11 @@ export class TestEventParentComponent extends DecathlonComponent {
 
     onTestButClick = (event) => {
         (this.testcom as TestEventComponent).printData();
+        console.log(event.type);
+    }
+
+    onMouseHandler = (event) => {
+        console.log(event.type);
     }
 
     render() {
@@ -85,13 +88,23 @@ export class TestEventParentComponent extends DecathlonComponent {
                 {
                     this.state["children"].map((item, key) => {
                         const ChildrenComponent = (item as Map<string, any>).get("view");
-                        const viewData = (item as Map<string, any>).get("data");
-                        const tmpGetEntity = (item as Map<string, any>).get("getEntity");
-                        // const ChildrenComponent = (item as IComponentFactory).newInstance();
-                        return < ChildrenComponent key={key} data={viewData} getEntity={tmpGetEntity}/>;
+                        const tmpProps = (item as Map<string, any>).get("props");
+                        return < ChildrenComponent key={key} {...tmpProps}/>;
                     })
                 }
-                <button onClick={this.onBtnClick}>hihihi</button>
+                <button onClick={this.onBtnClick}
+                        onMouseDown={this.onMouseHandler}
+                        onMouseMove={this.onMouseHandler}
+                        onMouseUp={this.onMouseHandler}
+                        onMouseLeave={this.onMouseHandler}
+                        onMouseEnter={this.onMouseHandler}
+                        onMouseOut={this.onMouseHandler}
+                        onMouseOver={this.onMouseHandler}
+                        draggable={true}
+                        onDrop={this.onMouseHandler}
+                        onDrag={this.onMouseHandler}
+                        onDragStart={this.onMouseHandler}
+                        onDragEnd={this.onMouseHandler}>hihihi</button>
                 <button onClick={this.onTestButClick}>test entity</button>
                 <TestEventComponent owner={this.owner} getEntity={(testEntity) => {this.testEntity = testEntity; }}/>
                 <DecathlonCanvas width={200} height={100} owner={this.owner} getEntity={(testEntity) => {this.canvas = testEntity; }}/>

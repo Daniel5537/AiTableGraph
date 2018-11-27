@@ -22,4 +22,9 @@ export class Point {
     public get y(): number {
         return this._y;
     }
+
+    public offset(dx: number, dy: number): void {
+        this._x - dx;
+        this._y - dy;
+    }
 }

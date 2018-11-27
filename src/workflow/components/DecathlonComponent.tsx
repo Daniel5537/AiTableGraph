@@ -32,10 +32,14 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
     private _y: number;
     private _position: string;
     private _data: object;
+    protected _scale: number = 1;
+    protected _scaleX: number = 1;
+    protected _scaleY: number = 1;
     // private _minWidth: number;
     // private _minHeight: number;
     // private _maxWidth: number;
     // private _maxHeight: number;
+    protected _doubleClickEnabled: boolean = true;
 
     constructor(props, context) {
         super(props, context);
@@ -146,6 +150,14 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
 
     public get styleObj(): object {
         return this._styleObj;
+    }
+
+    public set doubleClickEnabled(value: boolean) {
+        this._doubleClickEnabled = value;
+    }
+
+    public get doubleClickEnabled(): boolean {
+        return this._doubleClickEnabled;
     }
 
     public updateStyle(styleObj: object = null): void {
