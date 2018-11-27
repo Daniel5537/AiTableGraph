@@ -144,6 +144,14 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
         return this._position;
     }
 
+    public get scaleX(): number {
+        return this._scaleX;
+    }
+
+    public get scaleY(): number {
+        return this._scaleY;
+    }
+
     public set styleObj(value: object) {
         this._styleObj = value;
         this.setState({styleObject: this._styleObj});
