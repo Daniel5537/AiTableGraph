@@ -147,7 +147,7 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
     public set scale(value: number) {
         if (this._scale === value) return;
         this._scale = value;
-        this.setStyleObjValue("scale", value);
+        this.setStyleObjValue("transform", `scale(${value}, ${value})`);
     }
 
     public get scale(): number {
@@ -157,7 +157,7 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
     public set scaleX(value: number) {
         if (this._scaleX === value) return;
         this._scaleX = value;
-        this.setStyleObjValue("scaleX", value);
+        this.setStyleObjValue("transform", `scaleX(${value})`);
     }
 
     public get scaleX(): number {
@@ -167,7 +167,7 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
     public set scaleY(value: number) {
         if (this._scaleY === value) return;
         this._scaleY = value;
-        this.setStyleObjValue("scaleY", value);
+        this.setStyleObjValue("transform", `scaleY(${value})`);
     }
 
     public get scaleY(): number {

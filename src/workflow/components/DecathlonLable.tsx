@@ -78,6 +78,11 @@ export class DecathlonLable extends DecathlonComponent {
         return this._colorLable;
     }
 
+    componentWillMount() {
+        this._styleObjLabel = {};
+        console.log(this.props);
+    }
+
     render() {
         return (
             <p style={this.state["styleObject"]}>{this.state["text"]}</p>
