@@ -67,7 +67,7 @@ export class TestEventParentComponent extends DecathlonComponent {
         // let n2: any = t2.newInstance();
         let viewDict: Map<string, any> = new Map<string, any>();
         viewDict.set("view", n1);
-        viewDict.set("props", {"data": {"data bbibibibi": 30}, "getEntity": (testEntity) => {this.testcom = testEntity; }});
+        viewDict.set("props", {"owner": this.owner, "data": {"data bbibibibi": 30}, "getEntity": (testEntity) => {this.testcom = testEntity; }});
         testfact.push(viewDict);
         // testfact.push(n2);
         this.setState({children: testfact});
@@ -75,14 +75,15 @@ export class TestEventParentComponent extends DecathlonComponent {
 
     onTestButClick = (event) => {
         (this.testcom as TestEventComponent).printData();
-        console.log(event.type);
+        // console.log(event.type);
     }
 
     onMouseHandler = (event) => {
-        console.log(event.type);
+        // console.log(event.type);
     }
 
     render() {
+        // @ts-ignore
         return (
             <div>
                 {
@@ -92,19 +93,7 @@ export class TestEventParentComponent extends DecathlonComponent {
                         return < ChildrenComponent key={key} {...tmpProps}/>;
                     })
                 }
-                <button onClick={this.onBtnClick}
-                        onMouseDown={this.onMouseHandler}
-                        onMouseMove={this.onMouseHandler}
-                        onMouseUp={this.onMouseHandler}
-                        onMouseLeave={this.onMouseHandler}
-                        onMouseEnter={this.onMouseHandler}
-                        onMouseOut={this.onMouseHandler}
-                        onMouseOver={this.onMouseHandler}
-                        draggable={true}
-                        onDrop={this.onMouseHandler}
-                        onDrag={this.onMouseHandler}
-                        onDragStart={this.onMouseHandler}
-                        onDragEnd={this.onMouseHandler}>hihihi</button>
+                <button onClick={this.onBtnClick}>hihihi</button>
                 <button onClick={this.onTestButClick}>test entity</button>
                 <TestEventComponent owner={this.owner} getEntity={(testEntity) => {this.testEntity = testEntity; }}/>
                 <DecathlonCanvas width={200} height={100} owner={this.owner} getEntity={(testEntity) => {this.canvas = testEntity; }}/>

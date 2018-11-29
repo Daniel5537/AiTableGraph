@@ -6,6 +6,6 @@ import {IVisualEdge} from "./IVisualEdge";
 export interface IEdgeRenderer extends IDataRenderer {
     fPoint: Point;
     tPoint: Point;
-    draw(): void;
+    draw(vedge: IVisualEdge): void;
     labelCoordinates(vedge: IVisualEdge): Point;
 }

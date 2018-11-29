@@ -5,12 +5,15 @@ import {IVisualNode} from "./IVisualNode";
 import {IVisualEdge} from "./IVisualEdge";
 import {IGraph} from "../data/IGraph";
 import {ILayoutAlgorithm} from "../layout/ILayoutAlgorithm";
+import {EntityMouseEvent} from "../../../workflow/events/EntityMouseEvent";
+import {IComponentFactory} from "../../../workflow/global/IComponentFactory";
+import {IEdgeRenderer} from "./IEdgeRenderer";
 
 export interface IVisualGraph extends IEventDispatcher {
     graph: IGraph;
-    itemRenderer: IFactory;
-    edgeRendererFactory: IFactory;
-    edgeLabelRenderer: IFactory;
+    itemRenderer: IComponentFactory;
+    edgeRenderer: IEdgeRenderer;
+    edgeLabelRenderer: IComponentFactory;
     displayEdgeLabels: boolean;
     layouter: ILayoutAlgorithm;
     origin: Point;
@@ -42,9 +45,22 @@ export interface IVisualGraph extends IEventDispatcher {
 
     redrawEdges(): void;
 
-    redrawNodes(): void;
+    // redrawNodes(): void;
+    refreshVnode(vn: IVisualNode): void;
+
+    closeSubVnode(vn: IVisualNode): void;
+
+    refresh(): void;
 
     scroll(sx: number, sy: number, reset: boolean): void;
+    // reloadData(xml:XML): void;
+    // removeAllChildren(): void;
 
+    handleDrag2(event: EntityMouseEvent): void;
+    dragEnd(event: EntityMouseEvent): void;
+    dragBegin(event: EntityMouseEvent): void;
+    setNodeVisibility(vn: IVisualNode, visible: boolean): void;
+
+    updateConnectedEdgesVisibility(vn: IVisualNode): void;
     calcNodesBoundingBox(): any;    //Rectangle
 }
