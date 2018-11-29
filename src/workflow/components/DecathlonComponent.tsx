@@ -33,6 +33,9 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
     private _y: number;
     private _position: string;
     private _data: object;
+    private _fontSize: number = 12;
+    private _fontFamily: string = "Microsoft yahei";
+    private _color: string = "#666";
     protected _scale: number = 1;
     protected _scaleX: number = 1;
     protected _scaleY: number = 1;
@@ -172,6 +175,37 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
 
     public get scaleY(): number {
         return this._scaleY;
+    }
+
+    public set fontSize(value: number) {
+        if (this._fontSize === value)
+            return;
+        this._fontSize = value;
+        this.setStyleObjValue("fontSize", this._fontSize + "px");
+    }
+
+    public get fontSize(): number {
+        return this._fontSize;
+    }
+
+    public set fontFamily(value: string) {
+        if (this._fontFamily === value) return;
+        this._fontFamily = value;
+        this.setStyleObjValue("fontFamily", this._fontFamily + "px");
+    }
+
+    public get fontFamily(): string {
+        return this._fontFamily;
+    }
+
+    public set color(value: string) {
+        if (this._color === value) return;
+        this._color = value;
+        this.setStyleObjValue("color", value);
+    }
+
+    public get color(): string {
+        return this._color;
     }
 
     public set styleObj(value: object) {

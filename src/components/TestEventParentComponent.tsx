@@ -7,9 +7,11 @@ import {IFactory} from "../workflow/global/IFactory";
 import {ClassFactory} from "../workflow/global/ClassFactory";
 import {IComponentFactory} from "../workflow/global/IComponentFactory";
 import {ComponentFactory} from "../workflow/global/ComponentFactory";
+import {DecathlonLable} from "../workflow/components/DecathlonLable";
 
 export class TestEventParentComponent extends DecathlonComponent {
     private testEntity: DecathlonComponent;
+    private lable: DecathlonLable;
     private canvas: DecathlonCanvas;
     private testcom: TestEventComponent;
     private owner = this;
@@ -23,6 +25,9 @@ export class TestEventParentComponent extends DecathlonComponent {
     }
 
     componentDidMount() {
+        this.lable.text = "测试标签的文字";
+        this.lable.color = "#f0f";
+        this.lable.updateStyle();
         this.testEntity.entityAddEventListener(PersonEvent.TEST_EVENT, this.onChildEventHandler, this);
         console.log("listener");
         this.entityAddEventListener(PersonEvent.TEST_EVENT, this.onThisEventHandler, this);
@@ -96,7 +101,8 @@ export class TestEventParentComponent extends DecathlonComponent {
                 <button onClick={this.onBtnClick}>hihihi</button>
                 <button onClick={this.onTestButClick}>test entity</button>
                 <TestEventComponent owner={this.owner} getEntity={(testEntity) => {this.testEntity = testEntity; }}/>
-                <DecathlonCanvas width={200} height={100} owner={this.owner} getEntity={(testEntity) => {this.canvas = testEntity; }}/>
+                <DecathlonCanvas owner={this.owner} getEntity={(testEntity) => {this.canvas = testEntity;}}/>
+                <DecathlonLable owner={this.owner} getEntity={(testEntity) => {this.lable = testEntity;}}/>
             </div>
         );
     }
