@@ -9,6 +9,7 @@ export class EntityMouseEvent extends EventBase {
     public static MOUSE_OUT = "mouseOut";
     public static MOUSE_ENTER = "mouseEnter";
     public static MOUSE_LEAVE = "mouseLeave";
+    public static DOUBLE_CLICK = "doubleclick";
 
     constructor(type: string, data: Object= null, bubbles: boolean= true) {
         super(type, bubbles);

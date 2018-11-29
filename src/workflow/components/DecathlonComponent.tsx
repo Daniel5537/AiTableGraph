@@ -262,8 +262,9 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
             case "mouseleave":
                 this.entityDispatchEvent(new EntityMouseEvent(EntityMouseEvent.MOUSE_LEAVE, event.target));
                 break;
+            case "doubleclick":
+                this.entityDispatchEvent(new EntityMouseEvent(EntityMouseEvent.DOUBLE_CLICK, event.target));
+                break;
         }
     }
-
-    public removeChild(child: DecathlonComponent): void {}
 }

@@ -17,7 +17,8 @@ export default class TestEventComponent extends DecathlonComponent {
     }
 
     componentDidMount() {
-        this.todoTestDispatch();
+        // this.todoTestDispatch();
+        this.entityDispatchEvent(new PersonEvent(PersonEvent.TEST_EVENT, "hahaha"));
         console.log("dispatch");
     }
 
