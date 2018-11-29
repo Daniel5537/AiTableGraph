@@ -144,6 +144,36 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
         return this._position;
     }
 
+    public set scale(value: number) {
+        if (this._scale === value) return;
+        this._scale = value;
+        this.setStyleObjValue("scale", value);
+    }
+
+    public get scale() {
+        return this._scale;
+    }
+
+    public set scaleX(value: number) {
+        if (this._scaleX === value) return;
+        this._scaleX = value;
+        this.setStyleObjValue("scaleX", value);
+    }
+
+    public get scaleX() {
+        return this._scaleX;
+    }
+
+    public set scaleY(value: number) {
+        if (this._scaleY === value) return;
+        this._scaleY = value;
+        this.setStyleObjValue("scaleY", value);
+    }
+
+    public get scaleY() {
+        return this._scaleY;
+    }
+
     public set styleObj(value: object) {
         this._styleObj = value;
         this.setState({styleObject: this._styleObj});
@@ -197,7 +227,7 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
 
         this.componentEventBus.dispatchEvent(event);
         if (this.props.owner != null && event.bubbles) {
-            console.log(this.props.owner);
+            // console.log(this.props.owner);
             this.props.owner.entityDispatchEvent(event);
         }
     }

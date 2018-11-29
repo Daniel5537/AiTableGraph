@@ -2,10 +2,10 @@ import {DecathlonComponent} from "../workflow/components/DecathlonComponent";
 import {TestEventParentComponent} from "./TestEventParentComponent";
 import * as React from "react";
 import {PersonEvent} from "../events/PersonEvent";
-import {Cat} from "../test/Cat";
-import {Dog} from "../test/Dog";
-import {IFactory} from "../workflow/global/IFactory";
-import {ClassFactory} from "../workflow/global/ClassFactory";
+// import {Cat} from "../test/Cat";
+// import {Dog} from "../test/Dog";
+// import {IFactory} from "../workflow/global/IFactory";
+// import {ClassFactory} from "../workflow/global/ClassFactory";
 
 export class TestEventGrandFatherComponent extends DecathlonComponent {
     private owner = this;
