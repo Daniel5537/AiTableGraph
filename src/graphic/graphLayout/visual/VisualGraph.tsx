@@ -66,6 +66,13 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
     protected _configMoveNodes: Map<IVisualNode, IVisualNode>;
     protected _dragComponent: DecathlonComponent;
     protected _backgroundDragInProgress: boolean = false;
+    protected _dragCursorStartX: number;
+    protected _dragCursorStartY: number;
+    protected _drawingSurface: DecathlonComponent;
+    protected _newNodesDefaultVisible: boolean = true;
+    protected _isDrawLine: boolean = false;
+    protected _isMouseEnterFirst: boolean = true;
+    protected _isLineTopShow: boolean = false;
 
     public _defaultDragBackBound: boolean = true;
     public _displayMouseWheel: boolean = false;
@@ -1243,37 +1250,383 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
 
     public handleDrag2(event: EntityMouseEvent): void {
 
-        const mpoint:Point = globalMousePosition();
+        const mpoint: Point = this.globalMousePosition();
 
-        var deltaX:Number;
-        var deltaY:Number;
+        let deltaX: number;
+        let deltaY: number;
 
-        if (_scrollBackgroundInDrag) {
-            /* compute the movement offset of this move by
-             * subtracting the current mouse position from
-             * the last mouse position */
-            deltaX = mpoint.x - _dragCursorStartX;
-            deltaY = mpoint.y - _dragCursorStartY;
+        if (this._scrollBackgroundInDrag) {
 
-            deltaX /= scaleX
-            deltaY /= scaleY
+            deltaX = mpoint.x - this._dragCursorStartX;
+            deltaY = mpoint.y - this._dragCursorStartY;
 
-            /* scroll all objects by this offset */
+            deltaX /= this.scaleX;
+            deltaY /= this.scaleY;
+
             scroll(deltaX, deltaY);
         }
-        /* and inform the layouter about the dragEvent */
-        if(_layouter!=null){
-            _layouter.bgDragContinue(event);
+
+        if (this._layouter != null){
+            this._layouter.bgDragContinue(event);
         }
 
-        /* reset the drag start point for the next step */
-        _dragCursorStartX = mpoint.x;
-        _dragCursorStartY = mpoint.y;
+        this._dragCursorStartX = mpoint.x;
+        this._dragCursorStartY = mpoint.y;
 
-        /* make sure edges are redrawn */
-        //_drawingSurface.invalidateDisplayList();
-        refresh();
+        this.refresh();
+    }
 
+    protected backgroundDragBegin(event: EntityMouseEvent): void {
+
+        let mycomponent: DecathlonComponent;
+        const mpoint: Point = this.globalMousePosition();
+
+        if (this._layouter != null){
+            if (this._layouter.animInProgress) {
+                console.log("Animation in progress, drag attempt ignored");
+                return;
+            }
+        }
+
+        mycomponent = (this as UIComponent);
+
+        this._backgroundDragInProgress = true;
+
+        this._dragCursorStartX = mpoint.x;
+        this._dragCursorStartY = mpoint.y;
+
+        if (this._defaultDragBackBound) {
+            mycomponent.addEventListener(MouseEvent.MOUSE_MOVE, this.backgroundDragContinue);
+        }
+
+        if (this._layouter != null) {
+            this._layouter.bgDragEvent(event);
+        }
+    }
+
+    protected backgroundDragContinue(event: EntityMouseEvent): void {
+
+        const mpoint: Point = this.globalMousePosition();
+
+        let deltaX: number;
+        let deltaY: number;
+
+        if (this._scrollBackgroundInDrag) {
+
+            deltaX = mpoint.x - this._dragCursorStartX;
+            deltaY = mpoint.y - this._dragCursorStartY;
+
+            deltaX /= this.scaleX;
+            deltaY /= this.scaleY;
+
+            scroll(deltaX, deltaY);
+        }
+
+        if (this._layouter != null) {
+            this._layouter.bgDragContinue(event);
+        }
+
+        this._dragCursorStartX = mpoint.x;
+        this._dragCursorStartY = mpoint.y;
+
+        this.refresh();
+    }
+
+    public backgroundDragInit(first: boolean = false): number {
+        let items: Array<any> = this._canvas.getChildren();
+        let min_x: number = 4000;
+        let max_x: number = 0;
+        let max_w: number = 0;
+        let min_y: number = 4000;
+        let max_y: number = 0;
+        let max_h: number = 0;
+        for (let ui:DecathlonComponent of items){
+            if (ui != this._drawingSurface){
+
+                if (ui.x + ui.width >= max_x) {
+                    max_x = ui.x + ui.width;
+                }
+
+                if (ui.x <= min_x && ui.x != 0) {
+                    min_x = ui.x;
+                }
+
+                if (ui.y + ui.height >= max_y) {
+                    max_y = ui.y + ui.height;
+                }
+
+                if (ui.y <= min_y && ui.y != 0) {
+                    min_y = ui.y;
+                }
+
+            }
+        }
+
+        let center_x: number = this.center.x / this.scaleX;
+        let center_y: number = this.center.y / this.scaleY;
+
+        let center_width: number = Math.floor(center_x - (max_x - min_x) / 2 - min_x);
+        let center_height: number = Math.floor(center_y - (max_y - min_y) / 2 - min_y);
+
+        if (max_x < this.width && center_width != 0) {
+            const mpoint: Point = new Point(this.center.x, this.center.y);
+
+            let deltaX: number;
+            let deltaY: number;
+
+            if (this._scrollBackgroundInDrag) {
+                if (first) {
+                    deltaX = center_width;
+                    deltaY = max_y < center_y * 2 ? center_height : 0;
+                }else{
+                    deltaX = mpoint.x - this._dragCursorStartX;
+                    deltaY = mpoint.y - this._dragCursorStartY;
+                }
+
+                for (let view: DecathlonComponent of items) {
+                    if (view != this._drawingSurface) {
+                        view.x += deltaX;
+                        view.y += deltaY;
+                    }
+                }
+
+                this._origin.offset(deltaX,deltaY);
+            }
+
+            this._dragCursorStartX = mpoint.x;
+            this._dragCursorStartY = mpoint.y;
+
+            this.refresh();
+        } else {
+            center_width = 0;
+        }
+
+        return center_width;
+    }
+
+    public backgroundDragClickNode(first: boolean = false, orginX: number = 0, orginY: number = 0): number {
+
+        let items: Array<any> =	this._canvas.getChildren();
+        let offsetX: number = 0;
+        let offsetY: number = 0;
+
+        let center_x: number = this.center.x / this.scaleX;
+        let center_y: number = this.center.y / this.scaleY;
+
+        offsetX = center_x - orginX;
+        offsetY = center_y - orginY;
+
+        const mpoint:Point = new Point(this.center.x, this.center.y);
+
+        var deltaX: number;
+        var deltaY: number;
+
+        if (this._scrollBackgroundInDrag) {
+            if (first){
+                deltaX = offsetX;
+                deltaY = offsetY;
+            } else {
+                deltaX = mpoint.x - this._dragCursorStartX;
+                deltaY = mpoint.y - this._dragCursorStartY;
+            }
+
+            for (let view: DecathlonComponent of items) {
+                if (view != this._drawingSurface) {
+                    view.x += deltaX;
+                    view.y += deltaY;
+                }
+            }
+
+            this._origin.offset(deltaX, deltaY);
+        }
+
+        this._dragCursorStartX = mpoint.x;
+        this._dragCursorStartY = mpoint.y;
+
+        this.refresh();
+
+        return 0;
+    }
+
+    public globalMousePosition(): Point {
+        return localToGlobal(new Point(mouseX, mouseY));
+    }
+
+    protected setDistanceLimitedNodeIds(vnids: Map<INode, INode>): void {
+        let val: boolean;
+        let amount: number;
+        let vn: IVisualNode;
+        let n: INode;
+
+        amount = 0;
+
+        this._prevNodeIDsWithinDistanceLimit = this._nodeIDsWithinDistanceLimit;
+        this._nodeIDsWithinDistanceLimit = new Map<IVisualNode, IVisualNode>();
+
+        for (n of vnids.values()) {
+            vn = n.vnode;
+            this._nodeIDsWithinDistanceLimit.set(vn, vn);
+
+            ++amount;
+        }
+
+        for (val of vnids.values()) {
+            if (val) {
+                ++amount;
+            }
+        }
+
+        this._noNodesWithinDistance = amount;
+    }
+
+    public updateVisibility(): void {
+        let n: INode;
+        let e: IEdge;
+        let edges: Array<any>;
+        let treeparents: Map<INode, INode>;
+        let vn: IVisualNode;
+        let vno: IVisualNode;
+        let pvn: IVisualNode;
+        let newVisibleNodes: Map<IVisualNode, IVisualNode>;
+        let toInvisibleNodes: Map<IVisualNode, IVisualNode>;
+
+        if (this._layouter != null) {
+            this._layouter.resetAll();
+        }
+
+        toInvisibleNodes = new Map<IVisualNode, IVisualNode>();
+        for (vn in this._visibleVNodes.values()) {
+            toInvisibleNodes.set(vn, vn);
+        }
+
+        newVisibleNodes = new Map<IVisualNode, IVisualNode>();
+
+        for (vn in this._nodeIDsWithinDistanceLimit.values()) {
+            newVisibleNodes.set(vn, vn);
+        }
+
+        if (this._showCurrentNodeHistory) {
+
+            treeparents = this._graph.getTree(this._currentRootVNode.node, false, false).parents;
+
+            for (vn of this._currentVNodeHistory.values()) {
+                n = vn.node;
+
+                while (n.vnode != this._currentRootVNode) {
+
+                    newVisibleNodes.set(n.vnode, n.vnode);
+                    n = treeparents.get(n);
+                    if (n == null) {
+                        throw Error("parent node was null but node was not root node");
+                    }
+                }
+            }
+        }
+
+        for (vn of toInvisibleNodes.values()) {
+            if (newVisibleNodes.get(vn) != null) {
+                toInvisibleNodes.delete(vn);
+                newVisibleNodes.delete(vn);
+            }
+        }
+
+        for (vn of toInvisibleNodes.values()) {
+            this.setNodeVisibility(vn, false);
+        }
+
+        for (vn of newVisibleNodes.values()) {
+            this.setNodeVisibility(vn, true);
+        }
+
+        this.setAllEdgesInVisible();
+        this.updateEdgeVisibility();
+    }
+
+    public setAllVisible(): void {
+        let n: INode;
+        let e: IEdge;
+
+        if (this._graph == null) {
+            console.log("setAllVisible() called, but graph is null");
+            return;
+        }
+
+        if (this._layouter != null) {
+            this._layouter.resetAll();
+        }
+
+        this._visibleVNodes = new Map<IVisualNode, IVisualNode>();
+        this._noVisibleVNodes = 0;
+
+        for (n of this._graph.nodes) {
+            this.setNodeVisibility(n.vnode, true);
+        }
+
+        this._visibleVEdges = new Map<IVisualEdge, IVisualEdge>();
+
+        for (e of this._graph.edges) {
+            this.setEdgeVisibility(e.vedge, true);
+        }
+    }
+
+    protected setAllInVisible(): void {
+        let vn: IVisualNode;
+        let ve: IVisualEdge;
+
+        if (this._graph == null) {
+            console.log("setAllInVisible() called, but graph is null");
+            return;
+        }
+
+        if (this._layouter != null) {
+            this._layouter.resetAll();
+        }
+
+        for (vn of this._visibleVNodes.values()) {
+            this.setNodeVisibility(vn, false);
+        }
+
+        for (ve of this._visibleVEdges.values()) {
+            this.setEdgeVisibility(ve, false);
+        }
+    }
+
+    public setAllEdgesInVisible(): void {
+        let ve: IVisualEdge;
+        for (ve of this._visibleVEdges.values()) {
+            this.setEdgeVisibility(ve, false);
+        }
+    }
+
+    public setNodeVisibility(vn: IVisualNode, visible: boolean): void {
+
+        let comp: DecathlonComponent;
+
+        if (vn.isVisible == visible) {
+            console.log("Tried to set node:" + vn.id + " visibility to:" + visible.toString() + " but it was already.");
+            return;
+        }
+
+        if (visible) {
+            vn.isVisible = true;
+            this._visibleVNodes.set(vn, vn);
+
+            ++this._noVisibleVNodes;
+
+            comp = this.createVNodeComponent(vn);
+
+            comp.visible = true;
+            console.log(comp.width);
+        } else {
+            vn.isVisible = false;
+
+            this._visibleVNodes.delete(vn);
+            --this._noVisibleVNodes;
+
+            if (vn.view != null) {
+                this.removeComponent(vn.view, false);
+            }
+        }
     }
 
     public setEdgeVisibility(ve: IVisualEdge, visible: boolean): void {
@@ -1302,6 +1655,237 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
                 this.removeVEdgeView(ve.labelView);
             }
         }
+    }
+
+    public updateConnectedEdgesVisibility(vn: IVisualNode): void {
+        let edges: Array<any>;
+        let ovn: IVisualNode;
+        let e: IEdge;
+
+        edges = vn.node.inEdges;
+
+        edges = edges.concat(vn.node.outEdges);
+
+        for (e of edges) {
+            ovn = e.othernode(vn.node).vnode;
+
+            if (vn.isVisible && ovn.isVisible) {
+                this.setEdgeVisibility(e.vedge,true);
+            } else {
+                this.setEdgeVisibility(e.vedge, false);
+            }
+        }
+    }
+
+    public refreshVnode(vn: IVisualNode): void {
+        if (vn != null) {
+            if (this._visibilityLimitActive) {
+                this.setDistanceLimitedNodeIds(this._graph.getTree(vn.node, false, false).getLimitedNodes(2));
+                this.updateSubNodeVisibility(vn);
+            } else {
+                this.draw();
+            }
+        }
+    }
+
+    public closeSubVnode(vn: IVisualNode): void {
+        if (vn != null) {
+            if (this._visibilityLimitActive) {
+                this.closeSubNodeVisibility(vn);
+            } else {
+                this.draw();
+            }
+        }
+    }
+
+    protected updateSubNodeVisibility(root: IVisualNode): void {
+        let n: INode;
+        let e: IEdge;
+        let edges: Array<any>;
+        // let treeparents: Dictionary;
+        let vn: IVisualNode;
+        let vno: IVisualNode;
+        let pvn: IVisualNode
+        let newVisibleNodes: Map<IVisualNode, IVisualNode>;
+        // let toInvisibleNodes: Dictionary;
+
+        if (this._layouter != null) {
+            this._layouter.resetAll();
+        }
+
+        newVisibleNodes = new Map<IVisualNode, IVisualNode>();
+
+        let vnArray: Array<any> = this._graph.getTree(root.node, false, false).getChildren(root.node);
+
+        for (n of vnArray){
+            let vn: IVisualNode = n.vnode ;
+            newVisibleNodes.set(vn, vn);
+        }
+
+        for (vn of newVisibleNodes.values()) {
+            this.setNodeVisibility(vn, true);
+        }
+
+        this.setAllEdgesInVisible();
+        this.updateEdgeVisibility();
+
+        console.log("currentVNode:" + this.currentRootVNode.id);
+
+        this.draw();
+    }
+
+    protected closeSubNodeVisibility(root: IVisualNode): void {
+        // let n: INode;
+        // let e: IEdge;
+        // let edges:Array;
+        // let treeparents:Dictionary;
+        // let vn:IVisualNode;
+        // let vno:IVisualNode;
+        // let pvn:IVisualNode
+        // let newVisibleNodes:Dictionary;
+        // let tovisibleNodes:Dictionary;
+
+        if (this._layouter != null) {
+            this._layouter.resetAll();
+        }
+
+        this.setNodeChildrenVisibility(root, false);
+
+        this.setAllEdgesInVisible();
+
+        this.updateEdgeVisibility();
+
+        console.log("currentVNode:" + this.currentRootVNode.id);
+
+        this.draw();
+    }
+
+    public set dragEnable(value: boolean):void{
+        this._dragEnable = value;
+
+        let vn: IVisualNode;
+
+        if (value) {
+            for (vn of this.visibleVNodes.values()) {
+                vn.view.addEventListener(MouseEvent.MOUSE_DOWN, this.nodeMouseDown);
+                vn.view.addEventListener(MouseEvent.MOUSE_UP, this.dragEnd);
+            }
+        } else {
+            for (vn of this.visibleVNodes.values()) {
+                vn.view.removeEventListener(MouseEvent.MOUSE_DOWN, this.nodeMouseDown);
+                vn.view.removeEventListener(MouseEvent.MOUSE_UP, this.dragEnd);
+            }
+        }
+    }
+
+    private setNodeChildrenVisibility(root: IVisualNode, flag: boolean): void {
+        let vnArray: Array<any> = this._graph.getTree(root.node, false, false).getChildren(root.node);
+        let n: INode;
+        for (n of vnArray ){
+            let vn: IVisualNode = n.vnode ;
+            this.setNodeChildrenVisibility(vn, flag)
+            this.setNodeVisibility(n.vnode, flag);
+        }
+    }
+
+    public get newNodesVisible(): boolean{
+        return this._newNodesDefaultVisible;
+    }
+
+    public set newNodesVisible(s: boolean) {
+        this._newNodesDefaultVisible = s;
+    }
+    public get mulriSelectNodes(): Map<IVisualNode, IVisualNode> {
+        return this._configMoveNodes;
+    }
+
+    public set mulriSelectNodes(value: Map<IVisualNode, IVisualNode>) {
+        this._configMoveNodes = value;
+    }
+
+    public get isDrawLine(): boolean{
+        return this._isDrawLine;
+    }
+
+    public set isDrawLine(s: boolean) {
+        this._isDrawLine = s;
+    }
+
+    public get isMouseEnterFirst(): boolean{
+        return this._isMouseEnterFirst;
+    }
+    public set isMouseEnterFirst(s: boolean) {
+        this._isMouseEnterFirst = s;
+    }
+
+    // public reloadData(xmldata:XML):void{
+    //     var rgraph:IGraph = new Graph("XMLAsDocsGraph",true,xmldata);
+    //
+    //     this.graph = rgraph ;
+    //
+    //     this.currentRootVNode = graph.nodes[0].vnode;
+    //
+    //     this.draw();
+    // }
+
+    public set changeVerticalScrollPosition(position: number) {
+        this.verticalScrollPosition = position;
+    }
+
+    public set changeHorizontalScrollPosition(position: number) {
+        this.horizontalScrollPosition = position;
+    }
+
+    public set backgroundDragInProgress(value: boolean) {
+        this._backgroundDragInProgress = value;
+    }
+
+    public get backgroundDragInProgress(): boolean {
+        return this._backgroundDragInProgress;
+    }
+
+    public set dragCursorStartX(value: number) {
+        this._dragCursorStartX = value;
+    }
+
+    public get dragCursorStartX(): number {
+        return this._dragCursorStartX ;
+    }
+
+    public set dragCursorStartY(value: number) {
+        this._dragCursorStartY = value;
+    }
+
+    public get dragCursorStartY(): number {
+        return this._dragCursorStartY ;
+    }
+
+    public get viewToVNodeMap(): Map<DecathlonComponent, IVisualNode> {
+        return this._viewToVNodeMap;
+    }
+
+    public set dragComponent(value: DecathlonComponent) {
+        this._dragComponent = value;
+    }
+
+    public get dragComponent(): DecathlonComponent {
+        return this._dragComponent ;
+    }
+
+    public set isLineTopShow(value: boolean) {
+        this._isLineTopShow = value;
+    }
+
+    public get isLineTopShow(): boolean {
+        return this._isLineTopShow ;
+    }
+
+    public set drawingSurface(value: DecathlonComponent) {
+        this._drawingSurface = value;
+    }
+
+    public get drawingSurface(): DecathlonComponent {
+        return this._drawingSurface;
     }
 
     render() {
