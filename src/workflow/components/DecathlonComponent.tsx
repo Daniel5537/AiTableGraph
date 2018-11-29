@@ -150,7 +150,7 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
         this.setStyleObjValue("scale", value);
     }
 
-    public get scale() {
+    public get scale(): number {
         return this._scale;
     }
 
@@ -160,7 +160,7 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
         this.setStyleObjValue("scaleX", value);
     }
 
-    public get scaleX() {
+    public get scaleX(): number {
         return this._scaleX;
     }
 
@@ -170,7 +170,7 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
         this.setStyleObjValue("scaleY", value);
     }
 
-    public get scaleY() {
+    public get scaleY(): number {
         return this._scaleY;
     }
 

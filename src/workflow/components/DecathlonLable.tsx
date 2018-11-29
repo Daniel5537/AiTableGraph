@@ -54,7 +54,7 @@ export class DecathlonLable extends DecathlonComponent {
         this.setStyleObjLabel("fontSize", this._fontSizeLable + "px");
     }
 
-    public get fontSize() {
+    public get fontSize(): number {
         return this._fontSizeLable;
     }
 
@@ -64,7 +64,7 @@ export class DecathlonLable extends DecathlonComponent {
         this.setStyleObjLabel("fontFamily", this._fontFamilyLable + "px");
     }
 
-    public get fontFamily() {
+    public get fontFamily(): string {
         return this._fontFamilyLable;
     }
 
@@ -74,7 +74,7 @@ export class DecathlonLable extends DecathlonComponent {
         this.setStyleObjLabel("color", value);
     }
 
-    public get Color() {
+    public get Color(): string {
         return this._colorLable;
     }
 
