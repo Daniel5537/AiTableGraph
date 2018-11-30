@@ -22,8 +22,8 @@ export interface IDecathlonComponentProps {
     visible?: boolean;
     position?: string;
     data?: object;
-    percentWidth?: number | string;
-    percentHeight?: number | string;
+    percentWidth?: number;
+    percentHeight?: number;
 }
 
 export class DecathlonComponent extends React.Component<IDecathlonComponentProps, {}> implements IDecathlonEventDispatcher, IDataRenderer {
@@ -31,6 +31,8 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
     private _styleObj: object = {};
     private _width: number;
     private _height: number;
+    private _percentWidth: number;
+    private _percentHeight: number;
     private _x: number;
     private _y: number;
     private _position: string;
@@ -41,8 +43,6 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
     protected _scale: number = 1;
     protected _scaleX: number = 1;
     protected _scaleY: number = 1;
-    private _percentWidth: number | string;
-    private _percentHeight: number | string;
     // private _minWidth: number;
     // private _minHeight: number;
     // private _maxWidth: number;
@@ -119,6 +119,28 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
 
     public get width(): number {
         return this._width;
+    }
+
+    public set percentWidth(value: number) {
+        if (value === this._percentWidth)
+            return;
+        this._percentWidth = value;
+        this.setStyleObjValue("percentWidth", this._percentWidth);
+    }
+
+    public get percentWidth(): number {
+        return this._percentWidth;
+    }
+
+    public set percentHeight(value: number) {
+        if (value === this._percentHeight)
+            return;
+        this._percentHeight = value;
+        this.setStyleObjValue("percentHeight", this._percentHeight);
+    }
+
+    public get percentHeight(): number {
+        return this._percentHeight;
     }
 
     public set visible(value: boolean) {
@@ -210,24 +232,6 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
 
     public get color(): string {
         return this._color;
-    }
-
-    public set percentWidth(value: number | string) {
-        if (this._percentWidth === value) return;
-        this._percentWidth = value
-    }
-
-    public get percentWidth(): number | string {
-        return this._percentWidth;
-    }
-
-    public set percentHeight(value: number | string) {
-        if (this._percentHeight === value) return;
-        this._percentHeight = value
-    }
-
-    public get percentHeight(): number | string {
-        return this._percentHeight;
     }
 
     public set styleObj(value: object) {
