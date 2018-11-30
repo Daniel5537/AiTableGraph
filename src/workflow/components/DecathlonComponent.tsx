@@ -22,6 +22,7 @@ export interface IDecathlonComponentProps {
     visible?: boolean;
     position?: string;
     data?: object;
+    className?: string;
     percentWidth?: number;
     percentHeight?: number;
 }

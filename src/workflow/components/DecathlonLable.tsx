@@ -24,7 +24,7 @@ export class DecathlonLable extends DecathlonComponent {
 
     render() {
         return (
-            <p style={this.state["styleObject"]}>{this.state["text"]}</p>
+            <p className={this.props.className} style={this.state["styleObject"]}>{this.state["text"]}</p>
         );
     }
 }

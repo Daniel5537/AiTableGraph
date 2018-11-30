@@ -32,6 +32,7 @@ export class DecathlonCanvas extends DecathlonComponent {
     render() {
         return (
             <div style={this.state["styleObject"]}
+                 className={this.props.className}
                  onClick={this.entityMouseEventDispatch}
                  onMouseDown={this.entityMouseEventDispatch}
                  onMouseMove={this.entityMouseEventDispatch}
