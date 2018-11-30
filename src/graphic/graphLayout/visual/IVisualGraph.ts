@@ -8,8 +8,9 @@ import {ILayoutAlgorithm} from "../layout/ILayoutAlgorithm";
 import {EntityMouseEvent} from "../../../workflow/events/EntityMouseEvent";
 import {IComponentFactory} from "../../../workflow/global/IComponentFactory";
 import {IEdgeRenderer} from "./IEdgeRenderer";
+import {IDecathlonEventDispatcher} from "../../../workflow/components/DecathlonComponent";
 
-export interface IVisualGraph extends IEventDispatcher {
+export interface IVisualGraph extends IDecathlonEventDispatcher {
     graph: IGraph;
     itemRenderer: IComponentFactory;
     edgeRenderer: IEdgeRenderer;

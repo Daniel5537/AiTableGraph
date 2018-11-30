@@ -72,6 +72,7 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
     protected _isMouseEnterFirst: boolean = true;
     protected _isLineTopShow: boolean = false;
     protected _forceUpdateEdges: boolean = false;
+    protected his_mouse_point: Point = new Point(0, 0);
     protected _defaultEdgeStyle: object = {
         thickness: 1,
         alpha: 1.0,
@@ -81,11 +82,13 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
     public _defaultDragBackBound: boolean = true;
     public _displayMouseWheel: boolean = false;
     public _viewToVNodeMap: Map<DecathlonComponent, IVisualNode>;
-    public _defaultDragAllNode: boolean = false;
+    public _defaultDragAllNode: boolean = true;
     public _defaultDoubleClick: boolean = true;
-    public _dragEnable: boolean = false;
+    public _dragEnable: boolean = true;
     public dragLockCenter: boolean = false;
     public newNodesDefaultVisible: boolean = true;
+    public selectedEdge: IEdge;
+    public selectedNode: INode;
 
     constructor(props, context) {
         super(props, context);
@@ -136,7 +139,10 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
             this._noNodesWithinDistance = 0;
         }
 
-        this._graph = g;
+        if (this._layouter) {
+            this._layouter.graph = g;
+        }
+
         this.initFromGraph();
         this._currentRootVNode = null;
 
@@ -367,21 +373,8 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
     }
 
     public initFromGraph(): void {
-        // let bgnode: INode;
         let node: INode;
         let edge: IEdge;
-
-        // background node to show
-        // for each(bgnode in this._graph.bgnodes){
-        //
-        //     this.createBGVNode(bgnode);
-        // }
-
-        // 	if(isLineTopShow){
-        // if (!this._canvas.contains(this._drawingSurface)){
-        //     this._canvas.addChild(_drawingSurface);
-        // }
-        // }
 
         for (node of this._graph.nodes) {
             this.createVNode(node);
@@ -636,7 +629,7 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
 
     public refresh(): void {
         this._forceUpdateEdges = true;
-        this._canvas.invalidateDisplayList();
+        // this._canvas.invalidateDisplayList();
     }
 
     public draw(): void {
@@ -654,12 +647,12 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
             this._layouter.layoutPass();
         }
 
-        this._canvas.invalidateDisplayList();
+        // this._canvas.invalidateDisplayList();
 
         this.entityDispatchEvent(new VGraphEvent(VGraphEvent.VGRAPH_CHANGED));
     }
 
-    protected updateDisplayList(unscaledWidth: number, unscaledHeight: number): void {
+    // protected updateDisplayList(unscaledWidth: number, unscaledHeight: number): void {
         // super.updateDisplayList(unscaledWidth,unscaledHeight);
         // if(_layouter==null){
         //     _forceUpdateEdges = false;
@@ -673,19 +666,13 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
         //     _forceUpdateEdges = false;
         //     _layouter.layoutChanged = false;
         // }
-    }
+    // }
 
     public createVNode(n: INode): IVisualNode {
 
         let vnode: IVisualNode;
 
         vnode = new VisualNode(this, n, n.id, null, n.data);
-
-        console.log(n.data["visible"]);
-        if (n.data["visible"] != null && n.data["visible"] !== "") {
-            let _visible: boolean = n.data["visible"];
-            this.setNodeVisibility(vnode, _visible);
-        }
 
         if (this.newNodesDefaultVisible) {
             this.setNodeVisibility(vnode, true);
@@ -838,9 +825,9 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
              * assigned with it that affect the drawing. */
             // 	if(_edgeRenderer==null){
             let edgeClass: string = vedge.data["edge_class"];
-            this._edgeRenderer = EdgeRendererFactory.getEdgeInstance(edgeClass, this);
-            // 	}
-            this._edgeRenderer.draw(vedge);
+            // this._edgeRenderer = EdgeRendererFactory.getEdgeInstance(edgeClass, this);
+            // // 	}
+            // this._edgeRenderer.draw(vedge);
         }
     }
 
@@ -859,45 +846,29 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
 
         if (this._itemRendererFactory != null) {
             mycomponent = this._itemRendererFactory.newInstance();
-        } else if (vn.data["node_class"] != null) {
-
-            // mycomponent = new UIComponent();
-            // mycomponent = NodeRendererFactory.getNodeInstance(vn.data.@nodeClass);
-
-            /*let obj:Class = flash.utils.getDefinitionByName(LoadNodeClass.node_path+"."+vn.data.node_class) as Class;
-            let renderer: IFactory  = new ClassFactory(obj);
-            // trace(obj.id);
-            //	itemRenderer = renderer;
-            mycomponent = renderer.newInstance();*/
-
         } else {
             mycomponent = new DecathlonComponent({}, {});
         }
 
-        // if (mycomponent is IDataRenderer) {
+        // if (mycomponent instanceof IDataRenderer) {
             (mycomponent as IDataRenderer).data = vn;
         // }
 
-        mycomponent.x = vn.data["pos_x"];
-        mycomponent.y = vn.data["pos_y"];
+        mycomponent.x = this.width / 2;
+        mycomponent.y = this.width / 2;
 
-        /* add event handlers for dragging and double click */
         if (this._defaultDoubleClick) {
             mycomponent.doubleClickEnabled = this._defaultDoubleClick;
             mycomponent.entityAddEventListener(EntityMouseEvent.DOUBLE_CLICK, this.nodeDoubleClick, this);
         }
 
         if (this._dragEnable) {
-
             mycomponent.entityAddEventListener(EntityMouseEvent.MOUSE_DOWN, this.nodeMouseDown, this);
             mycomponent.entityAddEventListener(EntityMouseEvent.MOUSE_UP, this.dragEnd, this);
         }
 
-        // this._canvas.addChild(mycomponent);
         this._nodeEntityViews.push(mycomponent);
 
-        /* do we have an effect set for addition of
-         * items? If yes, create and start it. */
         // if (this.addItemEffect != null) {
         //     this.addItemEffect.createInstance(mycomponent).startEffect();
         // }
@@ -907,9 +878,9 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
 
         ++this._componentCounter;
 
-        if (this._componentCounter > this._noVisibleVNodes) {
-            throw Error("Got too many components:" + this._componentCounter + " but only:" + this._noVisibleVNodes + " nodes visible");
-        }
+        // if (this._componentCounter > this._noVisibleVNodes) {
+        //     throw Error("Got too many components:" + this._componentCounter + " but only:" + this._noVisibleVNodes + " nodes visible");
+        // }
 
         this.refresh();
         return mycomponent;
@@ -928,7 +899,8 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
         // } else {
         /* remove the component from it's parent (which should be the canvas) */
         if (component.props.owner != null) {
-            component.props.owner.removeChild(component);
+            // ==============
+            // component.props.owner.removeChild(component);
         }
 
         /* remove event mouse listeners */
@@ -949,56 +921,39 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
         // }
     }
 
-    protected createVEdgeView(ve: IVisualEdge): DecathlonComponent {
-        let mycomponent: DecathlonLable = null;
-        if (ve.data["is_show_name"] === 1 ) {
-            if (this._edgeLabelRendererFactory != null) {
-                mycomponent = this._edgeLabelRendererFactory.newInstance();
-            } else {
-                mycomponent = new DecathlonLable(null, null);
-                // mycomponent.setStyle("textAlign", "center");
-                // if (ve.data.font_color!=null && ve.data.font_color!=""){
-                //     mycomponent.setStyle("color", ve.data.font_color);
-                // }
-                // mycomponent.buttonMode = true ;
-                // mycomponent.setStyle("useHandCursor", true);
-                // mycomponent.mouseChildren=false;
-                if (ve.data != null && this._displayEdgeLabels) {
-                    if (ve.data["edgelabel"] != null) {
-                        (mycomponent as DecathlonLable).text = ve.data["edgelabel"];
-                    } else {
-                        (mycomponent as DecathlonLable).text = "link";
-                    }
-                    // mycomponent.toolTip= ve.data.edgelabel;
-                    // mycomponent.doubleClickEnabled = true;
-                    // mycomponent.addEventListener(MouseEvent.CLICK,onLineClick);
-                }
-            }
+    protected createVEdgeView(ve: IVisualEdge): IEdgeRenderer {
+        let mycomponent: IEdgeRenderer = null;
 
-            if (mycomponent["data"]) {
-                (mycomponent as IDataRenderer).data = ve;
-            }
-
-            let vn: IVisualNode;
-            let count: number = 0;
-            for (vn of this._visibleVNodes.values()) {
-                count++;
-            }
-
-            // _canvas.addChildAt(mycomponent, count);
-            this._edgeLabelEntityViews.push(mycomponent);
-
-            ve.labelView = mycomponent;
-            this._viewToVEdgeMap.set(mycomponent, ve);
-
-            if (this._edgeRenderer != null) {
-                ve.setEdgeLabelCoordinates(this._edgeRenderer.labelCoordinates(ve));
-            } else {
-                ve.setEdgeLabelCoordinates(new Point(this._canvas.width / 2.0, this._canvas.height / 2.0));
-            }
-
-            // refresh();
+        if (this._edgeRendererFactory != null) {
+            mycomponent = this._edgeRendererFactory.newInstance();
+        } else {
+            // mycomponent = new BaseEdgeRenderer({}, {});
         }
+
+        // mycomponent.percentWidth = 100;
+        // mycomponent.percentHeight = 100;
+
+        // UIComponent(mycomponent).useHandCursor = true;
+        // UIComponent(mycomponent).buttonMode = true;
+
+        // (mycomponent as DecathlonComponent).entityAddEventListener(EntityMouseEvent.CLICK, this.edgeClicked, this);
+        // (mycomponent as DecathlonComponent).entityAddEventListener(EntityMouseEvent.MOUSE_OVER, this.edgeRollOver, this);
+        // (mycomponent as DecathlonComponent).entityAddEventListener(EntityMouseEvent.MOUSE_OUT, this.edgeRollOut, this);
+
+        // if(mycomponent instanceof IDataRenderer) {
+            (mycomponent as IDataRenderer).data = ve;
+        // }
+
+        // mycomponent.cacheAsBitmap = cacheRendererObjects;
+
+        this._edgeEntityViews.push({"view": mycomponent});
+
+        ve.edgeView = mycomponent;
+        // @ts-ignore
+        this._edgeViewToVEdgeMap.set((mycomponent as DecathlonComponent), ve);
+
+        this.refresh();
+
         return mycomponent;
     }
 
@@ -1007,7 +962,7 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
         let ve: IVisualEdge;
 
         if (component.props.owner != null) {
-            component.props.owner.removeChild(component);
+            this._edgeEntityViews.unshift(component);
         }
 
         ve = this._viewToVEdgeMap.get(component);
@@ -1033,98 +988,90 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
         vnode = this.lookupNode(comp);
 
         this.currentRootVNode = vnode;
-        this.maxVisibleDistance = vnode.data["open_deep"];
-        console.log("currentVNode:" + this.currentRootVNode.id);
 
         this.draw();
     }
 
     public nodeMouseDown(e: EntityMouseEvent): void {
-        // this.toolTip = null;             ===================
         if (this._defaultDragAllNode) {
             let evnode: IVisualNode;
-            let mycomponent: DecathlonComponent;
-            const mpoint: Point = globalMousePosition();
-            let pt: Point;
 
-            if (this._layouter != null) {
-                if (this._layouter.animInProgress) {
-                    console.log("Animation in progress, drag attempt ignored");
-                    return;
-                }
-            }
+            // if (this._layouter != null) {
+            //     if (this._layouter.animInProgress) {
+            //         console.log("Animation in progress, drag attempt ignored");
+            //         return;
+            //     }
+            // }
 
-            if (e.target is DecathlonComponent) {
+            if (e.target instanceof DecathlonComponent) {
                 this._backgroundDragInProgress = false;
 
-                // e.stopImmediatePropagation();
-                this._dragCursorStartX = mpoint.x;
-                this._dragCursorStartY = mpoint.y;
-                /* register the backgroundDrag listener to react to
-                     * the mouse movements */
-                /*	mycomponent.addEventListener(MouseEvent.MOUSE_MOVE, backgroundDragContinue);*/
                 let ecomponent: DecathlonComponent = (e.target as DecathlonComponent);
-                evnode = this._viewToVNodeMap.get(ecomponent);
+                // evnode = this._viewToVNodeMap.get(ecomponent);
                 this._dragComponent = ecomponent;
-                ecomponent.entityAddEventListener(EntityMouseEvent.MOUSE_MOVE, this.handleDrag2, this);
-                /* and inform the layouter about the dragEvent */
-                if (this._layouter != null) {
-                    this._layouter.dragEvent(e, evnode);
-                }
+                ecomponent.entityAddEventListener(EntityMouseEvent.MOUSE_MOVE, this.onNodeMoveHandler, this);
+
+                // if (this._layouter != null) {
+                //     this._layouter.dragEvent(e, evnode);
+                // }
             }
         } else {
-            this.his_mouse_point.x = this.contentMouseX;
-            this.his_mouse_point.y = this.contentMouseY;
+            // this._backgroundDragInProgress = false;
+            // this._nodeMovedInDrag = false;
             this.dragBegin(e);
         }
     }
 
-    private canvasKeyDown(event: KeyboardEvent): void {
-        // 向上箭头事件处理 y-10
-        let step: number = 1;
-        let node: IVisualNode;
-        if (event.keyCode.toString() == "38") {
-            if (this._configMoveNodes !== null) {
-                for (node of this._configMoveNodes.values()) {
-                    node.view.y = node.view.y - step;
-                }
-            }
-        }
-        // 向下箭头事件处理  y+10
-        if (event.keyCode.toString() == "40") {
-            if (this._configMoveNodes !== null) {
-                for (node of this._configMoveNodes.values()) {
-                    node.view.y = node.view.y + step;
-                }
-            }
-        }
-        // 向左箭头事件处理 x-10
-        if (event.keyCode.toString() == "37") {
-            if (this._configMoveNodes !== null) {
-                for (node of this._configMoveNodes.values()) {
-                    node.view.x = node.view.x - step;
-                }
-            }
-        }
-        // 向右箭头事件处理 x+10
-        if (event.keyCode.toString() == "39") {
-            if (this._configMoveNodes !== null) {
-                for (node of this._configMoveNodes.values()) {
-                    node.view.x = node.view.x + step;
-                }
-            }
-        } else {
-            if (event.shiftKey) {// 全选组合,由于Ctrl+A 功能健,无法用Ctrl+A组合,这里用shift+A组合
-                if (event.keyCode == 65) {
-                    this._configMoveNodes = this._visibleVNodes;
-                    for (node of this._configMoveNodes.values()) {
-                        node.view.alpha = 0.3;
-                    }
-                }
-            }
-        }
-        this.refresh();
+    protected onNodeMoveHandler(event: EntityMouseEvent): void {
+
     }
+
+    // private canvasKeyDown(event: KeyboardEvent): void {
+    //     // 向上箭头事件处理 y-10
+    //     let step: number = 1;
+    //     let node: IVisualNode;
+    //     if (event.keyCode.toString() == "38") {
+    //         if (this._configMoveNodes !== null) {
+    //             for (node of this._configMoveNodes.values()) {
+    //                 node.view.y = node.view.y - step;
+    //             }
+    //         }
+    //     }
+    //     // 向下箭头事件处理  y+10
+    //     if (event.keyCode.toString() == "40") {
+    //         if (this._configMoveNodes !== null) {
+    //             for (node of this._configMoveNodes.values()) {
+    //                 node.view.y = node.view.y + step;
+    //             }
+    //         }
+    //     }
+    //     // 向左箭头事件处理 x-10
+    //     if (event.keyCode.toString() == "37") {
+    //         if (this._configMoveNodes !== null) {
+    //             for (node of this._configMoveNodes.values()) {
+    //                 node.view.x = node.view.x - step;
+    //             }
+    //         }
+    //     }
+    //     // 向右箭头事件处理 x+10
+    //     if (event.keyCode.toString() == "39") {
+    //         if (this._configMoveNodes !== null) {
+    //             for (node of this._configMoveNodes.values()) {
+    //                 node.view.x = node.view.x + step;
+    //             }
+    //         }
+    //     } else {
+    //         if (event.shiftKey) {// 全选组合,由于Ctrl+A 功能健,无法用Ctrl+A组合,这里用shift+A组合
+    //             if (event.keyCode == 65) {
+    //                 this._configMoveNodes = this._visibleVNodes;
+    //                 for (node of this._configMoveNodes.values()) {
+    //                     node.view.alpha = 0.3;
+    //                 }
+    //             }
+    //         }
+    //     }
+    //     this.refresh();
+    // }
 
     public dragBegin(event: EntityMouseEvent): void {
 
@@ -1132,14 +1079,14 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
         let evnode: IVisualNode;
         let pt: Point;
 
-        if (this._layouter != null) {
-            if (this._layouter.animInProgress) {
-                console.log("Animation in progress, drag attempt ignored");
-                return;
-            }
-        }
+        // if (this._layouter != null) {
+        //     if (this._layouter.animInProgress) {
+        //         console.log("Animation in progress, drag attempt ignored");
+        //         return;
+        //     }
+        // }
 
-        if (event.target is; DecathlonComponent; ) {
+        if (event.target instanceof DecathlonComponent) {
             ecomponent = (event.target as DecathlonComponent);
 
             evnode = this._viewToVNodeMap.get(ecomponent);
@@ -1148,13 +1095,13 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
 
             if (evnode != null) {
                 if (!this.dragLockCenter) {
-                    pt = ecomponent.localToGlobal(new Point(ecomponent.mouseX, ecomponent.mouseY));
+                    // pt = new Point(ecomponent.mouseX, ecomponent.mouseY);
                 } else {
-                    pt = ecomponent.localToGlobal(new Point(0, 0));
+                    pt = new Point(ecomponent.width / 2, ecomponent.height / 2);
                 }
 
-                this._drag_x_offsetMap.set(ecomponent, pt.x / scaleX - ecomponent.x);
-                this._drag_y_offsetMap.set(ecomponent, pt.y / scaleY - ecomponent.y);
+                this._drag_x_offsetMap.set(ecomponent, pt.x / this.scaleX - ecomponent.x);
+                this._drag_y_offsetMap.set(ecomponent, pt.y / this.scaleY - ecomponent.y);
 
                 this._dragComponent = ecomponent;
                 // if(_dragEnable){
@@ -1181,7 +1128,7 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
         if (this._backgroundDragInProgress) {
 
             this._backgroundDragInProgress = false;
-            myback = (this as DisplayObject);
+            myback = (this as DecathlonComponent);
 
             /* unregister event handler */
             myback.entityRemoveEventListener(EntityMouseEvent.MOUSE_MOVE, this.backgroundDragContinue);
@@ -1199,7 +1146,7 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
                 return;
             }
 
-            if (mycomp.stage != null) {
+            if (mycomp != null) {
                 if (this._defaultDragAllNode) {
                     mycomp.entityRemoveEventListener(EntityMouseEvent.MOUSE_MOVE, this.handleDrag2);
                 } else {
@@ -1232,22 +1179,23 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
         }
 
         if (this._moveNodeInDrag) {
-            sp.x = event.stageX / scaleX - this._drag_x_offsetMap.get(sp);
-            sp.y = event.stageY / scaleY - this._drag_y_offsetMap.get(sp);
+            // ====
+            // sp.x = event.stageX / this.scaleX - this._drag_x_offsetMap.get(sp);
+            // sp.y = event.stageY / this.scaleY - this._drag_y_offsetMap.get(sp);
         }
 
         myvnode = this._viewToVNodeMap.get(this._dragComponent);
         if (this._layouter != null) {
             this._layouter.dragContinue(event, myvnode);
             if (this._configMoveNodes != null) {
-                for (let node: IVisualNode of this._configMoveNodes.values()) {
+                for (let node of this._configMoveNodes.values()) {
                     node.view.x = node.view.x + (this.contentMouseX - this.his_mouse_point.x);
                     node.view.y = node.view.y + (this.contentMouseY - this.his_mouse_point.y);
                 }
             }
             this.refresh();
         }
-        event.updateAfterEvent();
+        // event.updateAfterEvent();
         this.his_mouse_point.x = this.contentMouseX;
         this.his_mouse_point.y = this.contentMouseY;
     }
@@ -1274,8 +1222,8 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
             this._layouter.bgDragContinue(event);
         }
 
-        this._dragCursorStartX = mpoint.x;
-        this._dragCursorStartY = mpoint.y;
+        // this._dragCursorStartX = mpoint.x;
+        // this._dragCursorStartY = mpoint.y;
 
         this.refresh();
     }
@@ -1292,7 +1240,7 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
             }
         }
 
-        mycomponent = (this as UIComponent);
+        mycomponent = (this as DecathlonComponent);
 
         this._backgroundDragInProgress = true;
 
@@ -1336,124 +1284,125 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
         this.refresh();
     }
 
-    public backgroundDragInit(first: boolean = false): number {
-        let items: Array<any> = this._canvas.getChildren();
-        let min_x: number = 4000;
-        let max_x: number = 0;
-        let max_w: number = 0;
-        let min_y: number = 4000;
-        let max_y: number = 0;
-        let max_h: number = 0;
-        for (let ui: DecathlonComponent of items) {
-            if (ui != this._drawingSurface) {
+    // public backgroundDragInit(first: boolean = false): number {
+    //     let items: Array<any> = this._canvas.getChildren();
+    //     let min_x: number = 4000;
+    //     let max_x: number = 0;
+    //     let max_w: number = 0;
+    //     let min_y: number = 4000;
+    //     let max_y: number = 0;
+    //     let max_h: number = 0;
+    //     for (let ui: DecathlonComponent of items) {
+    //         if (ui != this._drawingSurface) {
+    //
+    //             if (ui.x + ui.width >= max_x) {
+    //                 max_x = ui.x + ui.width;
+    //             }
+    //
+    //             if (ui.x <= min_x && ui.x != 0) {
+    //                 min_x = ui.x;
+    //             }
+    //
+    //             if (ui.y + ui.height >= max_y) {
+    //                 max_y = ui.y + ui.height;
+    //             }
+    //
+    //             if (ui.y <= min_y && ui.y != 0) {
+    //                 min_y = ui.y;
+    //             }
+    //
+    //         }
+    //     }
+    //
+    //     let center_x: number = this.center.x / this.scaleX;
+    //     let center_y: number = this.center.y / this.scaleY;
+    //
+    //     let center_width: number = Math.floor(center_x - (max_x - min_x) / 2 - min_x);
+    //     let center_height: number = Math.floor(center_y - (max_y - min_y) / 2 - min_y);
+    //
+    //     if (max_x < this.width && center_width != 0) {
+    //         const mpoint: Point = new Point(this.center.x, this.center.y);
+    //
+    //         let deltaX: number;
+    //         let deltaY: number;
+    //
+    //         if (this._scrollBackgroundInDrag) {
+    //             if (first) {
+    //                 deltaX = center_width;
+    //                 deltaY = max_y < center_y * 2 ? center_height : 0;
+    //             } else {
+    //                 deltaX = mpoint.x - this._dragCursorStartX;
+    //                 deltaY = mpoint.y - this._dragCursorStartY;
+    //             }
+    //
+    //             for (let view: DecathlonComponent of items) {
+    //                 if (view != this._drawingSurface) {
+    //                     view.x += deltaX;
+    //                     view.y += deltaY;
+    //                 }
+    //             }
+    //
+    //             this._origin.offset(deltaX, deltaY);
+    //         }
+    //
+    //         this._dragCursorStartX = mpoint.x;
+    //         this._dragCursorStartY = mpoint.y;
+    //
+    //         this.refresh();
+    //     } else {
+    //         center_width = 0;
+    //     }
+    //
+    //     return center_width;
+    // }
 
-                if (ui.x + ui.width >= max_x) {
-                    max_x = ui.x + ui.width;
-                }
-
-                if (ui.x <= min_x && ui.x != 0) {
-                    min_x = ui.x;
-                }
-
-                if (ui.y + ui.height >= max_y) {
-                    max_y = ui.y + ui.height;
-                }
-
-                if (ui.y <= min_y && ui.y != 0) {
-                    min_y = ui.y;
-                }
-
-            }
-        }
-
-        let center_x: number = this.center.x / this.scaleX;
-        let center_y: number = this.center.y / this.scaleY;
-
-        let center_width: number = Math.floor(center_x - (max_x - min_x) / 2 - min_x);
-        let center_height: number = Math.floor(center_y - (max_y - min_y) / 2 - min_y);
-
-        if (max_x < this.width && center_width != 0) {
-            const mpoint: Point = new Point(this.center.x, this.center.y);
-
-            let deltaX: number;
-            let deltaY: number;
-
-            if (this._scrollBackgroundInDrag) {
-                if (first) {
-                    deltaX = center_width;
-                    deltaY = max_y < center_y * 2 ? center_height : 0;
-                } else {
-                    deltaX = mpoint.x - this._dragCursorStartX;
-                    deltaY = mpoint.y - this._dragCursorStartY;
-                }
-
-                for (let view: DecathlonComponent of items) {
-                    if (view != this._drawingSurface) {
-                        view.x += deltaX;
-                        view.y += deltaY;
-                    }
-                }
-
-                this._origin.offset(deltaX, deltaY);
-            }
-
-            this._dragCursorStartX = mpoint.x;
-            this._dragCursorStartY = mpoint.y;
-
-            this.refresh();
-        } else {
-            center_width = 0;
-        }
-
-        return center_width;
-    }
-
-    public backgroundDragClickNode(first: boolean = false, orginX: number = 0, orginY: number = 0): number {
-
-        let items: Array<any> =	this._canvas.getChildren();
-        let offsetX: number = 0;
-        let offsetY: number = 0;
-
-        let center_x: number = this.center.x / this.scaleX;
-        let center_y: number = this.center.y / this.scaleY;
-
-        offsetX = center_x - orginX;
-        offsetY = center_y - orginY;
-
-        const mpoint: Point = new Point(this.center.x, this.center.y);
-
-        let deltaX: number;
-        let deltaY: number;
-
-        if (this._scrollBackgroundInDrag) {
-            if (first) {
-                deltaX = offsetX;
-                deltaY = offsetY;
-            } else {
-                deltaX = mpoint.x - this._dragCursorStartX;
-                deltaY = mpoint.y - this._dragCursorStartY;
-            }
-
-            for (let view: DecathlonComponent of items) {
-                if (view != this._drawingSurface) {
-                    view.x += deltaX;
-                    view.y += deltaY;
-                }
-            }
-
-            this._origin.offset(deltaX, deltaY);
-        }
-
-        this._dragCursorStartX = mpoint.x;
-        this._dragCursorStartY = mpoint.y;
-
-        this.refresh();
-
-        return 0;
-    }
+    // public backgroundDragClickNode(first: boolean = false, orginX: number = 0, orginY: number = 0): number {
+    //
+    //     let items: Array<any> =	this._canvas.getChildren();
+    //     let offsetX: number = 0;
+    //     let offsetY: number = 0;
+    //
+    //     let center_x: number = this.center.x / this.scaleX;
+    //     let center_y: number = this.center.y / this.scaleY;
+    //
+    //     offsetX = center_x - orginX;
+    //     offsetY = center_y - orginY;
+    //
+    //     const mpoint: Point = new Point(this.center.x, this.center.y);
+    //
+    //     let deltaX: number;
+    //     let deltaY: number;
+    //
+    //     if (this._scrollBackgroundInDrag) {
+    //         if (first) {
+    //             deltaX = offsetX;
+    //             deltaY = offsetY;
+    //         } else {
+    //             deltaX = mpoint.x - this._dragCursorStartX;
+    //             deltaY = mpoint.y - this._dragCursorStartY;
+    //         }
+    //
+    //         for (let view: DecathlonComponent of items) {
+    //             if (view != this._drawingSurface) {
+    //                 view.x += deltaX;
+    //                 view.y += deltaY;
+    //             }
+    //         }
+    //
+    //         this._origin.offset(deltaX, deltaY);
+    //     }
+    //
+    //     this._dragCursorStartX = mpoint.x;
+    //     this._dragCursorStartY = mpoint.y;
+    //
+    //     this.refresh();
+    //
+    //     return 0;
+    // }
 
     public globalMousePosition(): Point {
-        return localToGlobal(new Point(mouseX, mouseY));
+        // return localToGlobal(new Point(mouseX, mouseY));
+        return new Point(0, 0);
     }
 
     protected setDistanceLimitedNodeIds(vnids: Map<INode, INode>): void {
@@ -1474,7 +1423,7 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
             ++amount;
         }
 
-        for (val of vnids.values()) {
+        for (let val of vnids.values()) {
             if (val) {
                 ++amount;
             }
@@ -1485,12 +1434,12 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
 
     public updateVisibility(): void {
         let n: INode;
-        let e: IEdge;
-        let edges: Array<any>;
+        // let e: IEdge;
+        // let edges: Array<any>;
         let treeparents: Map<INode, INode>;
         let vn: IVisualNode;
-        let vno: IVisualNode;
-        let pvn: IVisualNode;
+        // let vno: IVisualNode;
+        // let pvn: IVisualNode;
         let newVisibleNodes: Map<IVisualNode, IVisualNode>;
         let toInvisibleNodes: Map<IVisualNode, IVisualNode>;
 
@@ -1499,13 +1448,13 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
         }
 
         toInvisibleNodes = new Map<IVisualNode, IVisualNode>();
-        for (vn in this._visibleVNodes.values()) {
+        for (vn of this._visibleVNodes.values()) {
             toInvisibleNodes.set(vn, vn);
         }
 
         newVisibleNodes = new Map<IVisualNode, IVisualNode>();
 
-        for (vn in this._nodeIDsWithinDistanceLimit.values()) {
+        for (vn of this._nodeIDsWithinDistanceLimit.values()) {
             newVisibleNodes.set(vn, vn);
         }
 
@@ -1516,7 +1465,7 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
             for (vn of this._currentVNodeHistory.values()) {
                 n = vn.node;
 
-                while (n.vnode != this._currentRootVNode) {
+                while (n.vnode !== this._currentRootVNode) {
 
                     newVisibleNodes.set(n.vnode, n.vnode);
                     n = treeparents.get(n);
@@ -1613,7 +1562,7 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
 
         let comp: DecathlonComponent;
 
-        if (vn.isVisible == visible) {
+        if (vn.isVisible === visible) {
             console.log("Tried to set node:" + vn.id + " visibility to:" + visible.toString() + " but it was already.");
             return;
         }
@@ -1622,21 +1571,32 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
             vn.isVisible = true;
             this._visibleVNodes.set(vn, vn);
 
+            if (this._visibleVNodesList.indexOf(vn) === -1)
+                this._visibleVNodesList.push(vn);
+
             ++this._noVisibleVNodes;
 
             comp = this.createVNodeComponent(vn);
 
             comp.visible = true;
-            console.log(comp.width);
         } else {
             vn.isVisible = false;
 
             this._visibleVNodes.delete(vn);
-            --this._noVisibleVNodes;
+
+            let newVisibleVNodes: Array<any> = [];
+            for (let vnode of this._visibleVNodesList) {
+                if (vnode !== vn)
+                    newVisibleVNodes.push(vnode);
+            }
+
+            this._visibleVNodesList = newVisibleVNodes;
 
             if (vn.view != null) {
                 this.removeComponent(vn.view, false);
             }
+
+            --this._noVisibleVNodes;
         }
     }
 
@@ -1654,7 +1614,7 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
             this._visibleVEdges.set(ve, ve);
 
             if (this._displayEdgeLabels && ve.labelView == null)
-                comp = this.createVEdgeView(ve);
+                // comp = this.createVEdgeView(ve);
 
             ve.isVisible = true;
 
@@ -1771,7 +1731,7 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
         this.draw();
     }
 
-    public set dragEnable(value: boolean): void {
+    public set dragEnable(value: boolean) {
         this._dragEnable = value;
 
         let vn: IVisualNode;
@@ -1839,13 +1799,13 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
     //     this.draw();
     // }
 
-    public set changeVerticalScrollPosition(position: number) {
-        this.verticalScrollPosition = position;
-    }
-
-    public set changeHorizontalScrollPosition(position: number) {
-        this.horizontalScrollPosition = position;
-    }
+    // public set changeVerticalScrollPosition(position: number) {
+    //     this.verticalScrollPosition = position;
+    // }
+    //
+    // public set changeHorizontalScrollPosition(position: number) {
+    //     this.horizontalScrollPosition = position;
+    // }
 
     public set backgroundDragInProgress(value: boolean) {
         this._backgroundDragInProgress = value;

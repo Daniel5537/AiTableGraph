@@ -7,5 +7,5 @@ export interface IEdgeRenderer extends IDataRenderer {
     fPoint: Point;
     tPoint: Point;
     draw(vedge: IVisualEdge): void;
-    labelCoordinates(vedge: IVisualEdge): Point;
+    labelCoordinates(p: Point, q: Point): Point;
 }
