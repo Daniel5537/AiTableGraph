@@ -25,6 +25,10 @@ export class DecathlonCanvas extends DecathlonComponent {
         return this._contentMouseX;
     }
 
+    componentWillMount() {
+        super.componentWillMount();
+    }
+
     render() {
         return (
             <div style={this.state["styleObject"]}

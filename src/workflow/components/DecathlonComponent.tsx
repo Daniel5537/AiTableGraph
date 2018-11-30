@@ -275,6 +275,8 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
             this._styleObj["height"] = this.props.height;
         if (this.props.data)
             this._data = this.props.data;
+
+        this.setState({styleObject: this._styleObj});
     }
 
     entityAddEventListener(type: string, listener: Function, context: any) {

@@ -100,8 +100,8 @@ export class TestEventParentComponent extends DecathlonComponent {
                 }
                 <button onClick={this.onBtnClick}>hihihi</button>
                 <button onClick={this.onTestButClick}>test entity</button>
-                <TestEventComponent owner={this.owner} getEntity={(testEntity) => {this.testEntity = testEntity; }}/>
-                <DecathlonCanvas owner={this.owner} getEntity={(testEntity) => {this.canvas = testEntity;}}/>
+                <TestEventComponent width={400} height={400} position={"absolute"} owner={this.owner} getEntity={(testEntity) => {this.testEntity = testEntity; }}/>
+                <DecathlonCanvas width={300} height={300} owner={this.owner} getEntity={(testEntity) => {this.canvas = testEntity;}}/>
                 <DecathlonLable owner={this.owner} getEntity={(testEntity) => {this.lable = testEntity;}}/>
             </div>
         );

@@ -1861,7 +1861,9 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
 
     render() {
         return(
-            <DecathlonCanvas getEntity={(mainDiv) => {this._canvas = mainDiv; }}>
+            <DecathlonCanvas width={800}
+                             height={600}
+                             getEntity={(mainDiv) => {this._canvas = mainDiv; }}>
                 {
                     this.state["edgeLabelChildren"].map((item, key) => {
                         const EdgeLabelChildrenComponent = item;

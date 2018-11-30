@@ -14,7 +14,7 @@ export class TestRender extends DecathlonComponent {
 
     render(){
         return(
-            <VisualGraph className="VGroup"/>
+            <VisualGraph width={800} height={600}/>
         );
     }
 }

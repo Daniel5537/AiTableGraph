@@ -5,6 +5,6 @@ import {TestRender} from "./components/TestRender";
 import "./scss/main.scss";
 
 ReactDOM.render(
-    <TestRender/>,
+    <TestEventGrandFatherComponent/>,
     document.getElementById("root")
 );
