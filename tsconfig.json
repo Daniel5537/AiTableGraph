@@ -4,8 +4,9 @@
         "sourceMap": true,
         "noImplicitAny": false,
         "module": "commonjs",
-        "target": "es6",
+        "target": "es5",
         "jsx": "react",
+        "downlevelIteration": true,
         "lib": ["es5", "es7", "es6", "dom"]
     },
     "include": [

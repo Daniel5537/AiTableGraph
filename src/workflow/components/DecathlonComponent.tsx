@@ -22,6 +22,8 @@ export interface IDecathlonComponentProps {
     visible?: boolean;
     position?: string;
     data?: object;
+    percentWidth?: number | string;
+    percentHeight?: number | string;
 }
 
 export class DecathlonComponent extends React.Component<IDecathlonComponentProps, {}> implements IDecathlonEventDispatcher, IDataRenderer {
@@ -39,6 +41,8 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
     protected _scale: number = 1;
     protected _scaleX: number = 1;
     protected _scaleY: number = 1;
+    private _percentWidth: number | string;
+    private _percentHeight: number | string;
     // private _minWidth: number;
     // private _minHeight: number;
     // private _maxWidth: number;
@@ -206,6 +210,24 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
 
     public get color(): string {
         return this._color;
+    }
+
+    public set percentWidth(value: number | string) {
+        if (this._percentWidth === value) return;
+        this._percentWidth = value
+    }
+
+    public get percentWidth(): number | string {
+        return this._percentWidth;
+    }
+
+    public set percentHeight(value: number | string) {
+        if (this._percentHeight === value) return;
+        this._percentHeight = value
+    }
+
+    public get percentHeight(): number | string {
+        return this._percentHeight;
     }
 
     public set styleObj(value: object) {
