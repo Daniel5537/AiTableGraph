@@ -126,7 +126,7 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
         if (value === this._percentWidth)
             return;
         this._percentWidth = value;
-        this.setStyleObjValue("percentWidth", this._percentWidth);
+        this.setStyleObjValue("percentWidth", this._percentWidth + "%");
     }
 
     public get percentWidth(): number {
@@ -137,7 +137,7 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
         if (value === this._percentHeight)
             return;
         this._percentHeight = value;
-        this.setStyleObjValue("percentHeight", this._percentHeight);
+        this.setStyleObjValue("percentHeight", this._percentHeight + "%");
     }
 
     public get percentHeight(): number {
@@ -270,8 +270,12 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
             this._styleObj["top"] = this.props.y;
         if (this.props.position)
             this._styleObj["position"] = this.props.position;
+        if (this.props.percentWidth)
+            this._styleObj["width"] = this.props.percentWidth + "%";
         if (this.props.width)
             this._styleObj["width"] = this.props.width;
+        if (this.props.percentHeight)
+            this._styleObj["height"] = this.props.percentHeight + "%";
         if (this.props.height)
             this._styleObj["height"] = this.props.height;
         if (this.props.data)

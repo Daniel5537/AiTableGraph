@@ -1,7 +1,7 @@
 import * as React from "react";
 import {DecathlonComponent} from "./DecathlonComponent";
 
-export class DecathlonCanvas extends DecathlonComponent {
+export class DecathlonCanvas<IDecathlonComponentProps> extends DecathlonComponent {
     private _contentMouseX: number = 0;
     private _contentMouseY: number = 0;
 

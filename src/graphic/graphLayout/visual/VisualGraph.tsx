@@ -21,7 +21,7 @@ import {VisualEdge} from "./VisualEdge";
 import {EntityMouseEvent} from "../../../workflow/events/EntityMouseEvent";
 import {Rectangle} from "../../../base/Rectangle";
 
-export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
+export class VisualGraph extends DecathlonComponent implements IVisualGraph {
     private _nodeEntityViews: Array<any> = [];
     private _edgeEntityViews: Array<any> = [];
     private _nodeLabelEntityViews: Array<any> = [];
@@ -1189,15 +1189,15 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
             this._layouter.dragContinue(event, myvnode);
             if (this._configMoveNodes != null) {
                 for (let node of this._configMoveNodes.values()) {
-                    node.view.x = node.view.x + (this.contentMouseX - this.his_mouse_point.x);
-                    node.view.y = node.view.y + (this.contentMouseY - this.his_mouse_point.y);
+                    // node.view.x = node.view.x + (this.contentMouseX - this.his_mouse_point.x);
+                    // node.view.y = node.view.y + (this.contentMouseY - this.his_mouse_point.y);
                 }
             }
             this.refresh();
         }
         // event.updateAfterEvent();
-        this.his_mouse_point.x = this.contentMouseX;
-        this.his_mouse_point.y = this.contentMouseY;
+        // this.his_mouse_point.x = this.contentMouseX;
+        // this.his_mouse_point.y = this.contentMouseY;
     }
 
     public handleDrag2(event: EntityMouseEvent): void {
@@ -1861,8 +1861,8 @@ export class VisualGraph extends DecathlonCanvas implements IVisualGraph {
 
     render() {
         return(
-            <DecathlonCanvas width={800}
-                             height={600}
+            <DecathlonCanvas percentWidth={this.props.percentWidth}
+                             percentHeight={this.props.percentWidth}
                              getEntity={(mainDiv) => {this._canvas = mainDiv; }}>
                 {
                     this.state["edgeLabelChildren"].map((item, key) => {

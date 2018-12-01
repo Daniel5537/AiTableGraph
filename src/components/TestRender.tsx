@@ -12,9 +12,9 @@ export class TestRender extends DecathlonComponent {
 
     }
 
-    render(){
+    render() {
         return(
-            <VisualGraph width={800} height={600}/>
+            <VisualGraph percentWidth={80} percentHeight={60}/>
         );
     }
 }
