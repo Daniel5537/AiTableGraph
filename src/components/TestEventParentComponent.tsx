@@ -1,4 +1,4 @@
-import {DecathlonComponent} from "../workflow/components/DecathlonComponent";
+import {DecathlonComponent, IDecathlonComponentProps} from "../workflow/components/DecathlonComponent";
 import TestEventComponent from "./TestEventComponent";
 import * as React from "react";
 import {PersonEvent} from "../events/PersonEvent";
@@ -12,7 +12,7 @@ import {DecathlonLable} from "../workflow/components/DecathlonLable";
 export class TestEventParentComponent extends DecathlonComponent {
     private testEntity: DecathlonComponent;
     private lable: DecathlonLable;
-    private canvas: DecathlonCanvas;
+    private canvas: DecathlonCanvas<IDecathlonComponentProps>;
     private testcom: TestEventComponent;
     private owner = this;
     private _testLab: string;

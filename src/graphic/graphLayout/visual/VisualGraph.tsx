@@ -1,6 +1,6 @@
 import {DecathlonCanvas} from "../../../workflow/components/DecathlonCanvas";
 import {IVisualGraph} from "./IVisualGraph";
-import {DecathlonComponent} from "../../../workflow/components/DecathlonComponent";
+import {DecathlonComponent, IDecathlonComponentProps} from "../../../workflow/components/DecathlonComponent";
 import {IVisualNode} from "./IVisualNode";
 import {IVisualEdge} from "./IVisualEdge";
 import {ComponentFactory} from "../../../workflow/global/ComponentFactory";
@@ -48,7 +48,7 @@ export class VisualGraph extends DecathlonComponent implements IVisualGraph {
     protected _graph: IGraph = null;
     protected _layouter: ILayoutAlgorithm;
     protected _currentRootVNode: IVisualNode = null;
-    protected _canvas: DecathlonCanvas;
+    protected _canvas: DecathlonCanvas<IDecathlonComponentProps>;
     protected _displayEdgeLabels: boolean = false;
     protected _edgeLabelRendererFactory: IComponentFactory = null;
     protected _viewToVEdgeMap: Map<DecathlonComponent, IVisualEdge>;
@@ -174,7 +174,7 @@ export class VisualGraph extends DecathlonComponent implements IVisualGraph {
         this._defaultDragBackBound = value;
     }
 
-    public get canvas(): DecathlonCanvas {
+    public get canvas(): DecathlonCanvas<IDecathlonComponentProps> {
         return this._canvas;
     }
 
@@ -1189,15 +1189,15 @@ export class VisualGraph extends DecathlonComponent implements IVisualGraph {
             this._layouter.dragContinue(event, myvnode);
             if (this._configMoveNodes != null) {
                 for (let node of this._configMoveNodes.values()) {
-                    // node.view.x = node.view.x + (this.contentMouseX - this.his_mouse_point.x);
-                    // node.view.y = node.view.y + (this.contentMouseY - this.his_mouse_point.y);
+                    node.view.x = node.view.x + (this.canvas.contentMouseX - this.his_mouse_point.x);
+                    node.view.y = node.view.y + (this.canvas.contentMouseY - this.his_mouse_point.y);
                 }
             }
             this.refresh();
         }
         // event.updateAfterEvent();
-        // this.his_mouse_point.x = this.contentMouseX;
-        // this.his_mouse_point.y = this.contentMouseY;
+        this.his_mouse_point.x = this.canvas.contentMouseX;
+        this.his_mouse_point.y = this.canvas.contentMouseY;
     }
 
     public handleDrag2(event: EntityMouseEvent): void {
@@ -1862,7 +1862,7 @@ export class VisualGraph extends DecathlonComponent implements IVisualGraph {
     render() {
         return(
             <DecathlonCanvas percentWidth={this.props.percentWidth}
-                             percentHeight={this.props.percentWidth}
+                             percentHeight={this.props.percentHeight}
                              getEntity={(mainDiv) => {this._canvas = mainDiv; }}>
                 {
                     this.state["edgeLabelChildren"].map((item, key) => {
