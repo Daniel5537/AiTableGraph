@@ -40,7 +40,7 @@ export type IDefaultProps<IDecathlonComponentProps, K extends keyof IDecathlonCo
 //     type
 // }
 
-export class DecathlonComponent extends React.Component<IDefaultProps<IDecathlonComponentProps, any>, {}> implements IDecathlonEventDispatcher, IDataRenderer {
+export class DecathlonComponent extends React.Component<IDecathlonComponentProps, {}> implements IDecathlonEventDispatcher, IDataRenderer {
     private _visible: boolean = true;
     private _styleObj: object = {};
     private _width: number;
