@@ -4,6 +4,7 @@ import {IEventDispatcher} from "../events/IEventDispatcher";
 import {EventDispatcher} from "../events/EventDispatcher";
 import {IDataRenderer} from "../../base/IDataRenderer";
 import {EntityMouseEvent} from "../events/EntityMouseEvent";
+import {ComponentType} from "react";
 
 export interface IDecathlonEventDispatcher {
     componentEventBus: IEventDispatcher;
@@ -27,7 +28,19 @@ export interface IDecathlonComponentProps {
     percentHeight?: number;
 }
 
-export class DecathlonComponent extends React.Component<IDecathlonComponentProps, {}> implements IDecathlonEventDispatcher, IDataRenderer {
+export type IDefaultProps<IDecathlonComponentProps, K extends keyof IDecathlonComponentProps> = {
+    [P in K]: IDecathlonComponentProps[P];
+};
+
+// export const withDecathlonProps = <P extends object, DP extends Partial<P> = Partial<P>>(
+//     defaultProps: DP,
+//     Comp: ComponentType<P>
+// ) => {
+//     type RequiredProps = Omit<P, keyof DP>;
+//     type
+// }
+
+export class DecathlonComponent extends React.Component<IDefaultProps<IDecathlonComponentProps, any>, {}> implements IDecathlonEventDispatcher, IDataRenderer {
     private _visible: boolean = true;
     private _styleObj: object = {};
     private _width: number;
