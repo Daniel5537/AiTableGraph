@@ -87,11 +87,11 @@ export class Graph extends EventDispatcher implements IGraph {
         return this._xmlData;
     }
 
-    public get nodes(): Array<any> {
+    public get nodes(): Array<INode> {
         return this._nodes;
     }
 
-    public get edges(): Array<any> {
+    public get edges(): Array<IEdge> {
         return this._edges;
     }
 

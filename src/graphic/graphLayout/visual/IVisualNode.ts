@@ -14,6 +14,7 @@ export interface IVisualNode extends IVisualItem {
     node: INode;
     moveable: boolean;
     orientAngle: number;
+    labelView: DecathlonComponent;
 
     refresh(): void;
 

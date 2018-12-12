@@ -69,10 +69,11 @@ export class TestEventParentComponent extends DecathlonComponent {
         // let t2: IComponentFactory = new ComponentFactory(TestEventComponent);
         let testfact: Array<any> = Object.assign([], this.state["childen"]);
         let n1: any = t1.newInstance();
+        // (n1 as TestEventComponent).name = "my name is hihi";
         // let n2: any = t2.newInstance();
         let viewDict: Map<string, any> = new Map<string, any>();
         viewDict.set("view", n1);
-        viewDict.set("props", {"owner": this.owner, "data": {"data bbibibibi": 30}, "getEntity": (testEntity) => {this.testcom = testEntity; }});
+        viewDict.set("props", {"owner": this.owner, "name": "my name is hihi", "data": {"data bbibibibi": 30}, "getEntity": (testEntity) => {this.testcom = testEntity; }});
         testfact.push(viewDict);
         // testfact.push(n2);
         this.setState({children: testfact});

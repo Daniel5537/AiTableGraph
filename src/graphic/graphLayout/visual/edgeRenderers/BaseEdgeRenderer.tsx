@@ -42,6 +42,10 @@ export class BaseEdgeRenderer extends DecathlonComponent implements IEdgeRendere
         this._edgeStyleObj = value;
     }
 
+    public unSelectedEdge(): void {
+
+    }
+
     handleMouseClick = (event) => {
         console.log("edge base mouse click");
     }

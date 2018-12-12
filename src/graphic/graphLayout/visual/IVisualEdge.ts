@@ -3,6 +3,7 @@ import {DecathlonComponent} from "../../../workflow/components/DecathlonComponen
 import {Point} from "../../../base/Point";
 import {IVisualItem} from "./IVisualItem";
 import {IEdgeRenderer} from "./IEdgeRenderer";
+import {BaseEdgeRenderer} from "./edgeRenderers/BaseEdgeRenderer";
 
 export interface IVisualEdge extends IVisualItem {
     edge: IEdge;
@@ -11,5 +12,5 @@ export interface IVisualEdge extends IVisualItem {
     setEdgeLabelCoordinates(p: Point): void;
 
     lineStyle: object;
-    edgeView: IEdgeRenderer;
+    edgeView: BaseEdgeRenderer;
 }

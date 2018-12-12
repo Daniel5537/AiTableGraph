@@ -1,19 +1,17 @@
 import {DecathlonCanvas} from "../../../workflow/components/DecathlonCanvas";
-import {DecathlonComponent, IDecathlonComponentProps, IDefaultProps} from "../../../workflow/components/DecathlonComponent";
+import {IDecathlonComponentProps} from "../../../workflow/components/DecathlonComponent";
 import {EntityMouseEvent} from "../../../workflow/events/EntityMouseEvent";
 import {CompassQuadrant} from "../../consts/CompassQuadrant";
 import * as React from "react";
 import "./TransformPointSprite.scss";
 
-export interface ICompassProps {
-    transfrormCompass?: string;
-}
-
-export class TransformPointSprite<ICompassProps> extends DecathlonComponent {
+export class TransformPointSprite extends DecathlonCanvas<IDecathlonComponentProps> {
     protected _transfrormCompass: string;
     constructor(props, context) {
         super(props, context);
-        this._transfrormCompass = this.props.transfrormCompass;
+        if (props["transfrormCompass"]) {
+            this._transfrormCompass = props["transfrormCompass"];
+        }
     }
 
     public get transfrormCompass(): string {
@@ -52,11 +50,5 @@ export class TransformPointSprite<ICompassProps> extends DecathlonComponent {
         let cloneStyle: object = Object.assign({}, this.styleObj);
         cloneStyle["cursor"] = "default";
         this.updateStyle(cloneStyle);
-    }
-
-    render() {
-        return (
-            <div className="baseCompass" style={this.state["styleObject"]}/>
-        );
     }
 }

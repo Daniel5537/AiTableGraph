@@ -855,7 +855,7 @@ export class VisualGraph extends DecathlonComponent implements IVisualGraph {
         // }
 
         mycomponent.x = this.width / 2;
-        mycomponent.y = this.width / 2;
+        mycomponent.y = this.height / 2;
 
         if (this._defaultDoubleClick) {
             mycomponent.doubleClickEnabled = this._defaultDoubleClick;

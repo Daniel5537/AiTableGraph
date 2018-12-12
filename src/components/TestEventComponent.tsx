@@ -3,8 +3,16 @@ import {DecathlonComponent} from "../workflow/components/DecathlonComponent";
 import {PersonEvent} from "../events/PersonEvent";
 
 export default class TestEventComponent extends DecathlonComponent {
+    private _name: string;
     constructor(props, context) {
         super(props, context);
+        if (props["name"]) {
+            this._name = props["name"];
+        }
+    }
+
+    public set name(value: string) {
+        this._name = value;
     }
 
     todoTestDispatch = () => {
@@ -28,6 +36,7 @@ export default class TestEventComponent extends DecathlonComponent {
 
     public printData = () => {
         console.log(this.data);
+        console.log(this._name);
     }
 
     render() {

@@ -13,7 +13,7 @@ import {IDecathlonEventDispatcher} from "../../../workflow/components/DecathlonC
 export interface IVisualGraph extends IDecathlonEventDispatcher {
     graph: IGraph;
     itemRenderer: IComponentFactory;
-    edgeRenderer: IEdgeRenderer;
+    edgeRenderer: IComponentFactory;
     edgeLabelRenderer: IComponentFactory;
     displayEdgeLabels: boolean;
     layouter: ILayoutAlgorithm;

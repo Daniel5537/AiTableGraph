@@ -26,6 +26,8 @@ export interface IDecathlonComponentProps {
     className?: string;
     percentWidth?: number;
     percentHeight?: number;
+    color?: string;
+    id?: string;
 }
 
 export type IDefaultProps<IDecathlonComponentProps, K extends keyof IDecathlonComponentProps> = {
@@ -41,6 +43,7 @@ export type IDefaultProps<IDecathlonComponentProps, K extends keyof IDecathlonCo
 // }
 
 export class DecathlonComponent extends React.Component<IDecathlonComponentProps, {}> implements IDecathlonEventDispatcher, IDataRenderer {
+    private _id: string;
     private _visible: boolean = true;
     private _styleObj: object = {};
     private _width: number;
@@ -57,6 +60,7 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
     protected _scale: number = 1;
     protected _scaleX: number = 1;
     protected _scaleY: number = 1;
+    protected _isSelected: boolean;
     // private _minWidth: number;
     // private _minHeight: number;
     // private _maxWidth: number;
@@ -81,6 +85,25 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
         let cloneStyleObj: object = Object.assign({}, this._styleObj);
         cloneStyleObj[key] = value;
         this._styleObj = cloneStyleObj;
+    }
+
+    public get id(): string {
+        return this._id;
+    }
+
+    public set id(value: string) {
+        this._id = value;
+    }
+
+    public set isSelected(value: boolean) {
+        if (this._isSelected === value)
+            return;
+
+        this._isSelected = value;
+    }
+
+    public get isSelected(): boolean {
+        return this._isSelected;
     }
 
     public set data(value: object) {
@@ -277,6 +300,8 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
 
     componentWillMount() {
         this._styleObj = {};
+        if (this.props.id)
+            this._id = this.props.id;
         if (this.props.x)
             this._styleObj["left"] = this.props.x;
         if (this.props.y)
@@ -347,4 +372,6 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
                 break;
         }
     }
+
+    public removeChild(component: DecathlonComponent): void {}
 }

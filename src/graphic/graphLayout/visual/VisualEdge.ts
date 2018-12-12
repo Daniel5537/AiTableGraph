@@ -6,6 +6,7 @@ import {IVisualGraph} from "./IVisualGraph";
 import {DecathlonComponent} from "../../../workflow/components/DecathlonComponent";
 import {IEdgeRenderer} from "./IEdgeRenderer";
 import {Point} from "../../../base/Point";
+import {BaseEdgeRenderer} from "./edgeRenderers/BaseEdgeRenderer";
 
 export class VisualEdge extends EventDispatcher implements IVisualEdge, IDataRenderer {
     private _id: number;
@@ -16,7 +17,7 @@ export class VisualEdge extends EventDispatcher implements IVisualEdge, IDataRen
     private _labelView: DecathlonComponent;
     private _lineStyle: object;
     private _centered: boolean;
-    private _edgeView: IEdgeRenderer;
+    private _edgeView: BaseEdgeRenderer;
 
     constructor(vg: IVisualGraph, edge: IEdge, id: number, data: object = null, lview: DecathlonComponent = null, lStyle: object = null) {
         super();
@@ -108,11 +109,11 @@ export class VisualEdge extends EventDispatcher implements IVisualEdge, IDataRen
         return this._lineStyle;
     }
 
-    public get edgeView(): IEdgeRenderer {
+    public get edgeView(): BaseEdgeRenderer {
         return this._edgeView;
     }
 
-    public set edgeView(value: IEdgeRenderer) {
+    public set edgeView(value: BaseEdgeRenderer) {
         this._edgeView = value;
     }
 }

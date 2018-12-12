@@ -6,8 +6,8 @@ import {IEventDispatcher} from "../../../workflow/events/IEventDispatcher";
 export interface IGraph extends IEventDispatcher {
     id: string;
     xmlData: XMLDocument;
-    nodes: Array<any>;
-    edges: Array<any>;
+    nodes: Array<INode>;
+    edges: Array<IEdge>;
     noNodes: number;
     noEdges: number;
     isDirectional: boolean;

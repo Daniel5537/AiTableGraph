@@ -22,6 +22,7 @@ export class VisualNode extends EventDispatcher implements IVisualNode, IDataRen
     private _view: DecathlonComponent;
     private _centered: boolean;
     private _orientAngle: number = 0;
+    private _labelView: DecathlonComponent;
 
     constructor(vg: IVisualGraph, node: INode, id: number, view: DecathlonComponent = null, data: object = null, mv: boolean = true) {
         super();
@@ -35,6 +36,14 @@ export class VisualNode extends EventDispatcher implements IVisualNode, IDataRen
         this._x = 0;
         this._y = 0;
         this._view = view;
+    }
+
+    public set labelView(value: DecathlonComponent) {
+        this._labelView = value;
+    }
+
+    public get labelView(): DecathlonComponent {
+        return this._labelView;
     }
 
     public get vgraph(): IVisualGraph {
