@@ -31,9 +31,17 @@ export class StepContainer extends DecathlonComponent {
 
     render() {
         return (
-            <DecathlonCanvas>
-                <p className="setpName">{this.state["hihi"]}</p>
-                <button>dedede</button>
+            <div className={"stepContainer"}
+                 style={this.state["styleObject"]}
+                 onClick={this.entityMouseEventDispatch}
+                 onMouseDown={this.entityMouseEventDispatch}
+                 onMouseMove={this.entityMouseEventDispatch}
+                 onMouseUp={this.entityMouseEventDispatch}
+                 onMouseOver={this.entityMouseEventDispatch}
+                 onMouseOut={this.entityMouseEventDispatch}
+                 onMouseEnter={this.entityMouseEventDispatch}
+                 onMouseLeave={this.entityMouseEventDispatch}
+                 onDoubleClick={this.entityMouseEventDispatch}>
                 {
                     this.state["nodesContainer"].map((item, key) => {
                         const ChildrenComponent = (item as Map<string, any>).get("view");
@@ -41,7 +49,7 @@ export class StepContainer extends DecathlonComponent {
                         return < ChildrenComponent key={key} {...stepProps}/>;
                     })
                 }
-            </DecathlonCanvas>
+            </div>
         );
     }
 }

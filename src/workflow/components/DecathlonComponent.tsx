@@ -27,6 +27,7 @@ export interface IDecathlonComponentProps {
     percentWidth?: number;
     percentHeight?: number;
     color?: string;
+    backgroundColor?: string;
     id?: string;
 }
 
@@ -316,6 +317,8 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
             this._styleObj["height"] = this.props.percentHeight + "%";
         if (this.props.height)
             this._styleObj["height"] = this.props.height;
+        if (this.props.backgroundColor)
+            this._styleObj["backgroundColor"] = this.props.backgroundColor;
         if (this.props.data)
             this._data = this.props.data;
 

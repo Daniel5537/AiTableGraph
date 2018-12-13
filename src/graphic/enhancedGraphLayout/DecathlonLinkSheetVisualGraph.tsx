@@ -32,20 +32,20 @@ export class DecathlonLinkSheetVisualGraph extends DecathlonComponent {
 
     componentWillMount() {
         console.log("初始化调用接口攞数据");
-        // this.init();
+        this.init();
     }
 
     componentDidMount() {
-        this.init();
+        // this.init();
     }
 
     public init() {
         // 模拟数据
-        let vStepDatas = [{"stepId": 1, "stepName": "step1", "width": 250, "x": 0, "height": 1080, "color": "#54A0FF"},
-                            {"stepId": 2, "stepName": "step2",  "width": 250, "x": 251, "height": 1080, "color": "#0BD3FF"},
-                            {"stepId": 3, "stepName": "step3", "width": 250, "x": 502, "height": 1080, "color": "#2ED5D6"},
-                            {"stepId": 4, "stepName": "step4", "width": 250, "x": 753, "height": 1080, "color": "#36D1A1"},
-                            {"stepId": 5, "stepName": "step5", "width": 250, "x": 1004, "height": 1080, "color": "#FBC958"}];
+        let vStepDatas = [{"stepId": 1, "stepName": "step1", "width": 250, "x": 0, "height": 1080, "backgroundColor": "#54A0FF"},
+                            {"stepId": 2, "stepName": "step2",  "width": 250, "x": 251, "height": 1080, "backgroundColor": "#0BD3FF"},
+                            {"stepId": 3, "stepName": "step3", "width": 250, "x": 502, "height": 1080, "backgroundColor": "#2ED5D6"},
+                            {"stepId": 4, "stepName": "step4", "width": 250, "x": 753, "height": 1080, "backgroundColor": "#36D1A1"},
+                            {"stepId": 5, "stepName": "step5", "width": 250, "x": 1004, "height": 1080, "backgroundColor": "#FBC958"}];
         let vNodeDatas = [{"id": "node1", "name": "Alice", "stepId": 1, "type": "BaseSheet"},
                     {"id": "node2", "name": "Kevin", "stepId": 1, "type": "BaseSheet"},
                     {"id": "node3", "name": "Jane", "stepId": 2, "type": "ETLSheet"},
@@ -72,9 +72,6 @@ export class DecathlonLinkSheetVisualGraph extends DecathlonComponent {
         // 初始化所有step实例用于后续加载
         for (let stepItemData of stepDatas) {
             let itemView: any = this._stepRendererFactory.newInstance();
-            // let itemObj: object = {};
-            // itemObj[CommConst.VIEW] = itemView;
-            // itemObj[CommConst.PROPS] = stepItemData;
             let itemDict: Map<string, any> = new Map<string, any>();
             itemDict.set(CommConst.VIEW, itemView);
             itemDict.set(CommConst.PROPS, stepItemData);
@@ -86,8 +83,16 @@ export class DecathlonLinkSheetVisualGraph extends DecathlonComponent {
 
     render() {
         return (
-            <DecathlonCanvas id={"linkSheetCanvas"} getEntity={(canvasComp) => {this._canvas = canvasComp; }}>
-                <button>hihi</button>
+            <div id={"linkSheetCanvas"}
+                 onClick={this.entityMouseEventDispatch}
+                 onMouseDown={this.entityMouseEventDispatch}
+                 onMouseMove={this.entityMouseEventDispatch}
+                 onMouseUp={this.entityMouseEventDispatch}
+                 onMouseOver={this.entityMouseEventDispatch}
+                 onMouseOut={this.entityMouseEventDispatch}
+                 onMouseEnter={this.entityMouseEventDispatch}
+                 onMouseLeave={this.entityMouseEventDispatch}
+                 onDoubleClick={this.entityMouseEventDispatch}>
                 {
                     this.state["stepsElement"].map((item, key) => {
                         const StepComponent = (item as Map<string, any>).get(CommConst.VIEW);
@@ -95,7 +100,7 @@ export class DecathlonLinkSheetVisualGraph extends DecathlonComponent {
                         return < StepComponent key={key} {...stepProps}/>;
                     })
                 }
-            </DecathlonCanvas>
+            </div>
         );
     }
 }

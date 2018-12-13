@@ -7,6 +7,9 @@ export class DecathlonCanvas<IDecathlonComponentProps> extends DecathlonComponen
 
     constructor(props, context) {
         super(props, context);
+        this.state = {
+            childrenElemelts: [],
+        };
     }
 
     public set contentMouseY(value: number) {
@@ -41,7 +44,7 @@ export class DecathlonCanvas<IDecathlonComponentProps> extends DecathlonComponen
                  onMouseOut={this.entityMouseEventDispatch}
                  onMouseEnter={this.entityMouseEventDispatch}
                  onMouseLeave={this.entityMouseEventDispatch}
-                 onDoubleClick={this.entityMouseEventDispatch}></div>
+                 onDoubleClick={this.entityMouseEventDispatch}>hihi</div>
         );
     }
 }

@@ -1,4 +1,5 @@
 export class LinkSheetDataUtil {
+    // 将nodes数据分step
     public static layerNodesDataForStep(nodes: Array<object>): Map<number, Array<object>> {
         let resultDict: Map<number, Array<object>> = new Map<number, Array<object>>();
         for (let nodeItem of nodes) {
