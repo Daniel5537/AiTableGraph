@@ -11,6 +11,7 @@ import {Point} from "../base/Point";
 import {StepHeaderContainer} from "../components/StepHeaderContainer";
 import {StepContainer} from "../graphic/enhancedGraphLayout/StepContainer";
 import {LinkSheetStepContainerEvent} from "../events/LinkSheetStepContainerEvent";
+import "./AiTableLinkSheet.scss";
 
 export class AiTableLinkSheet extends DecathlonComponent {
     protected _linkSheetHeader: AiTableLinkSheetStepHeader;
