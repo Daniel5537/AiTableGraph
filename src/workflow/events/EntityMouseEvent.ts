@@ -11,7 +11,7 @@ export class EntityMouseEvent extends EventBase {
     public static MOUSE_LEAVE = "mouseLeave";
     public static DOUBLE_CLICK = "doubleclick";
 
-    constructor(type: string, data: Object= null, bubbles: boolean= true) {
+    constructor(type: string, data: any= null, bubbles: boolean= true) {
         super(type, bubbles);
         this.data = data;
     }

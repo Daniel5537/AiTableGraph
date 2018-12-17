@@ -1,3 +1,3 @@
 export interface IDataRenderer {
-    data: object;
+    data: any;
 }

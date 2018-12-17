@@ -6,7 +6,7 @@ export class PersonEvent extends EventBase {
     public static TEST_EVENT: string = "testEvent";
     public static TEST_GLOBAL_EVENT: string = "testGlobalEvent";
 
-    constructor(type: string, data: Object= null, bubbles: boolean= true) {
+    constructor(type: string, data: any= null, bubbles: boolean= true) {
         super(type, bubbles);
         this.data = data;
     }

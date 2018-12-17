@@ -10,6 +10,7 @@ import {StepContainer} from "./StepContainer";
 import {ComponentFactory} from "../../workflow/global/ComponentFactory";
 import {CommConst} from "../consts/CommConst";
 import "./DecathlonLinkSheetVisualGraph.scss";
+import {LinkSheetHeaderEvent} from "../../events/LinkSheetHeaderEvent";
 
 
 export class DecathlonLinkSheetVisualGraph extends DecathlonComponent {
@@ -37,30 +38,32 @@ export class DecathlonLinkSheetVisualGraph extends DecathlonComponent {
 
     componentDidMount() {
         // this.init();
+        console.log("vg init");
     }
 
     public init() {
         // 模拟数据
-        let vStepDatas = [{"stepId": 1, "stepName": "step1", "width": 250, "x": 0, "height": 1080, "backgroundColor": "#54A0FF"},
-                            {"stepId": 2, "stepName": "step2",  "width": 250, "x": 251, "height": 1080, "backgroundColor": "#0BD3FF"},
-                            {"stepId": 3, "stepName": "step3", "width": 250, "x": 502, "height": 1080, "backgroundColor": "#2ED5D6"},
-                            {"stepId": 4, "stepName": "step4", "width": 250, "x": 753, "height": 1080, "backgroundColor": "#36D1A1"},
-                            {"stepId": 5, "stepName": "step5", "width": 250, "x": 1004, "height": 1080, "backgroundColor": "#FBC958"}];
-        let vNodeDatas = [{"id": "node1", "name": "Alice", "stepId": 1, "type": "BaseSheet"},
-                    {"id": "node2", "name": "Kevin", "stepId": 1, "type": "BaseSheet"},
-                    {"id": "node3", "name": "Jane", "stepId": 2, "type": "ETLSheet"},
-                    {"id": "node4", "name": "Daniel", "stepId": 2, "type": "LinkModule"},
-                    {"id": "node4", "name": "CiCi", "stepId": 3, "type": "ETLSheet"}];
-        let vEdgeDatas = [{"id": "edge1", "sourceId": "node1", "targetId": "node2", "transfrom": []},
-                            {"id": "edge2", "sourceId": "node2", "targetId": "node3", "transfrom": []},
-                            {"id": "edge1", "sourceId": "node2", "targetId": "node4", "transfrom": []}];
+        let vStepDatas = [{stepId: 1, stepName: "step1", width: 250, height: 1080, backgroundColor: "#54A0FF"},
+                            {stepId: 2, stepName: "step2",  width: 250, height: 1080, backgroundColor: "#0BD3FF"},
+                            {stepId: 3, stepName: "step3", width: 250, height: 1080, backgroundColor: "#2ED5D6"},
+                            {stepId: 4, stepName: "step4", width: 250, height: 1080, backgroundColor: "#36D1A1"},
+                            {stepId: 5, stepName: "step5", width: 250, height: 1080, backgroundColor: "#FBC958"}];
+        let vNodeDatas = [{id: "node1", name: "Alice", stepId: 1, type: "BaseSheet", x: 50, y: 100},
+                    {id: "node2", name: "Kevin", stepId: 1, type: "BaseSheet", x: 60, y: 200},
+                    {id: "node3", name: "Jane", stepId: 2, type: "ETLSheet", x: 10, y: 20},
+                    {id: "node4", name: "Daniel", stepId: 2, type: "LinkModule", x: 30, y: 300},
+                    {id: "node4", name: "CiCi", stepId: 3, type: "ETLSheet", x: 100, y: 200}];
+        let vEdgeDatas = [{id: "edge1", sourceId: "node1", targetId: "node2", transfrom: []},
+                            {id: "edge2", sourceId: "node2", targetId: "node3", transfrom: []},
+                            {id: "edge1", sourceId: "node2", targetId: "node4", transfrom: []}];
 
         let stepedNodeData: Map<number, Array<object>> = LinkSheetDataUtil.layerNodesDataForStep(vNodeDatas);
         console.log(stepedNodeData.size);
 
-        // this.setState({stepContainers: vStepDatas});
         this.initVGroup();
         this.initStep(vStepDatas);
+
+        this.owner.entityDispatchEvent(new LinkSheetHeaderEvent(LinkSheetHeaderEvent.GET_HEADER_INIT_DATA, vStepDatas));
     }
 
     protected initVGroup(): void {

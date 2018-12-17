@@ -5,7 +5,7 @@ export class TestHttpDataEvent extends EventBase{
     public static SUCCESS_GET_DATA:string = 'successGetData';
     public data:object;
 
-    constructor(type:string, data:object){
+    constructor(type: string, data: any){
         super(type);
         this.data = data;
     }

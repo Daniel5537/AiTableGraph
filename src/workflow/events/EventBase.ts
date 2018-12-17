@@ -5,7 +5,7 @@ export class EventBase {
     private _type: string;
     private _bubbles: boolean;
     private _cancelable: boolean;
-    private _data: object;
+    private _data: any;
     private _target: any;
 
     public set target(value: any) {
@@ -16,11 +16,11 @@ export class EventBase {
         return this._target;
     }
 
-    public set data(value: object) {
+    public set data(value: any) {
         this._data = value;
     }
 
-    public get data(): object {
+    public get data(): any {
         return this._data;
     }
 

@@ -1,15 +1,32 @@
 import * as React from "react";
 import {DecathlonComponent} from "./DecathlonComponent";
+import {CommConst} from "../../graphic/consts/CommConst";
 
 export class DecathlonCanvas<IDecathlonComponentProps> extends DecathlonComponent {
     private _contentMouseX: number = 0;
     private _contentMouseY: number = 0;
+    protected _childCollection: Array<any> = [];
 
     constructor(props, context) {
         super(props, context);
         this.state = {
-            childrenElemelts: [],
+            childrenElements: [],
         };
+    }
+
+    public addChild(componentData: Map<string, any>): void {
+        if (componentData != null) {
+            this._childCollection.push(componentData);
+        }
+    }
+
+    public removeChild(component: DecathlonComponent): void {
+        if (component == null)
+            return;
+    }
+
+    public get childCollection(): Array<any> {
+        return this._childCollection;
     }
 
     public set contentMouseY(value: number) {
@@ -44,7 +61,15 @@ export class DecathlonCanvas<IDecathlonComponentProps> extends DecathlonComponen
                  onMouseOut={this.entityMouseEventDispatch}
                  onMouseEnter={this.entityMouseEventDispatch}
                  onMouseLeave={this.entityMouseEventDispatch}
-                 onDoubleClick={this.entityMouseEventDispatch}>hihi</div>
+                 onDoubleClick={this.entityMouseEventDispatch}>
+                {
+                    this.state[CommConst.CHILDREN_ELEMENTS].map((item, key) => {
+                        const ChildrenComponent = (item as Map<string, any>).get("view");
+                        const tmpProps = (item as Map<string, any>).get("props");
+                        return < ChildrenComponent key={key} {...tmpProps}/>;
+                    })
+                }
+            </div>
         );
     }
 }

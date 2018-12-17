@@ -5,6 +5,7 @@ import {EventDispatcher} from "../events/EventDispatcher";
 import {IDataRenderer} from "../../base/IDataRenderer";
 import {EntityMouseEvent} from "../events/EntityMouseEvent";
 import {ComponentType} from "react";
+import {CommConst} from "../../graphic/consts/CommConst";
 
 export interface IDecathlonEventDispatcher {
     componentEventBus: IEventDispatcher;
@@ -29,6 +30,7 @@ export interface IDecathlonComponentProps {
     color?: string;
     backgroundColor?: string;
     id?: string;
+    zIndex?: number;
 }
 
 export type IDefaultProps<IDecathlonComponentProps, K extends keyof IDecathlonComponentProps> = {
@@ -44,36 +46,45 @@ export type IDefaultProps<IDecathlonComponentProps, K extends keyof IDecathlonCo
 // }
 
 export class DecathlonComponent extends React.Component<IDecathlonComponentProps, {}> implements IDecathlonEventDispatcher, IDataRenderer {
-    private _id: string;
-    private _visible: boolean = true;
-    private _styleObj: object = {};
-    private _width: number;
-    private _height: number;
-    private _percentWidth: number;
-    private _percentHeight: number;
-    private _x: number;
-    private _y: number;
-    private _position: string;
-    private _data: object;
-    private _fontSize: number = 12;
-    private _fontFamily: string = "Microsoft yahei";
-    private _color: string = "#666";
+    protected _id: string;
+    protected _visible: boolean = true;
+    protected _styleObj: object = {};
+    protected _width: number;
+    protected _height: number;
+    protected _percentWidth: number;
+    protected _percentHeight: number;
+    protected _x: number;
+    protected _y: number;
+    protected _position: string;
+    protected _data: any;
+    protected _fontSize: number = 12;
+    protected _fontFamily: string = "Microsoft yahei";
+    protected _color: string = "#666";
+    protected _owner: DecathlonComponent;
+    protected _keyId: number;
     protected _scale: number = 1;
     protected _scaleX: number = 1;
     protected _scaleY: number = 1;
     protected _isSelected: boolean;
+    protected _zIndex: number;
     // private _minWidth: number;
     // private _minHeight: number;
     // private _maxWidth: number;
     // private _maxHeight: number;
     protected _doubleClickEnabled: boolean = true;
+    protected _numChildren: number = 0;
 
     constructor(props, context) {
         super(props, context);
+        this._keyId = Date.parse(new Date().toString());
         if (this.props) {
             const { getEntity } = props;
             if (typeof getEntity === "function") {
                 getEntity(this);
+            }
+
+            if (this.props[CommConst.OWNER]) {
+                this._owner = this.props[CommConst.OWNER];
             }
         }
 
@@ -86,6 +97,14 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
         let cloneStyleObj: object = Object.assign({}, this._styleObj);
         cloneStyleObj[key] = value;
         this._styleObj = cloneStyleObj;
+    }
+
+    public get owner(): DecathlonComponent {
+        return this._owner;
+    }
+
+    public get keyId(): number {
+        return this._keyId;
     }
 
     public get id(): string {
@@ -107,11 +126,11 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
         return this._isSelected;
     }
 
-    public set data(value: object) {
+    public set data(value: any) {
         this._data = value;
     }
 
-    public get data(): object {
+    public get data(): any {
         return this._data;
     }
 
@@ -272,6 +291,16 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
         return this._color;
     }
 
+    public set zIndex(value: number) {
+        if (this._zIndex === value) return;
+        this._zIndex = value;
+        this.setStyleObjValue("zIndex", this._zIndex);
+    }
+
+    public get zIndex(): number {
+        return this._zIndex;
+    }
+
     public set styleObj(value: object) {
         this._styleObj = value;
         this.setState({styleObject: this._styleObj});
@@ -301,6 +330,8 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
 
     componentWillMount() {
         this._styleObj = {};
+        if (this.props.zIndex)
+            this._styleObj["zIndex"] = this.props.zIndex;
         if (this.props.id)
             this._id = this.props.id;
         if (this.props.x)
@@ -312,7 +343,7 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
         if (this.props.percentWidth)
             this._styleObj["width"] = this.props.percentWidth + "%";
         if (this.props.width)
-            this._styleObj["width"] = this.props.width;
+            this._width = this._styleObj["width"] = this.props.width;
         if (this.props.percentHeight)
             this._styleObj["height"] = this.props.percentHeight + "%";
         if (this.props.height)
@@ -347,34 +378,36 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
     entityMouseEventDispatch = (event) => {
         switch (event.type) {
             case "click":
-                this.entityDispatchEvent(new EntityMouseEvent(EntityMouseEvent.CLICK, event.target));
+                this.entityDispatchEvent(new EntityMouseEvent(EntityMouseEvent.CLICK, event));
                 break;
             case "mousedown":
-                this.entityDispatchEvent(new EntityMouseEvent(EntityMouseEvent.MOUSE_DOWN, event.target));
+                this.entityDispatchEvent(new EntityMouseEvent(EntityMouseEvent.MOUSE_DOWN, event));
                 break;
             case "mousemove":
-                this.entityDispatchEvent(new EntityMouseEvent(EntityMouseEvent.MOUSE_MOVE, event.target));
+                this.entityDispatchEvent(new EntityMouseEvent(EntityMouseEvent.MOUSE_MOVE, event));
                 break;
             case "mouseup":
-                this.entityDispatchEvent(new EntityMouseEvent(EntityMouseEvent.MOUSE_UP, event.target));
+                this.entityDispatchEvent(new EntityMouseEvent(EntityMouseEvent.MOUSE_UP, event));
                 break;
             case "mouseover":
-                this.entityDispatchEvent(new EntityMouseEvent(EntityMouseEvent.MOUSE_OVER, event.target));
+                this.entityDispatchEvent(new EntityMouseEvent(EntityMouseEvent.MOUSE_OVER, event));
                 break;
             case "mouseout":
-                this.entityDispatchEvent(new EntityMouseEvent(EntityMouseEvent.MOUSE_OUT, event.target));
+                this.entityDispatchEvent(new EntityMouseEvent(EntityMouseEvent.MOUSE_OUT, event));
                 break;
             case "mouseenter":
-                this.entityDispatchEvent(new EntityMouseEvent(EntityMouseEvent.MOUSE_ENTER, event.target));
+                this.entityDispatchEvent(new EntityMouseEvent(EntityMouseEvent.MOUSE_ENTER, event));
                 break;
             case "mouseleave":
-                this.entityDispatchEvent(new EntityMouseEvent(EntityMouseEvent.MOUSE_LEAVE, event.target));
+                this.entityDispatchEvent(new EntityMouseEvent(EntityMouseEvent.MOUSE_LEAVE, event));
                 break;
             case "doubleclick":
-                this.entityDispatchEvent(new EntityMouseEvent(EntityMouseEvent.DOUBLE_CLICK, event.target));
+                this.entityDispatchEvent(new EntityMouseEvent(EntityMouseEvent.DOUBLE_CLICK, event));
                 break;
         }
     }
+
+    public addChild(componentData: Map<string, any>): void {}
 
     public removeChild(component: DecathlonComponent): void {}
 }

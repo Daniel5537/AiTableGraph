@@ -10,8 +10,9 @@ export class VGraphEvent extends EventBase {
     public static VEST_LAYOUTER: number = 1;
     private _subtype: number;
 
-    constructor(type: string, bubbles: boolean = false, cancelable: boolean = false, subtype: number = VGraphEvent.VEST_DEFAULT) {
+    constructor(type: string, data: any = null, bubbles: boolean = false, cancelable: boolean = false, subtype: number = VGraphEvent.VEST_DEFAULT) {
         super(type, bubbles, cancelable);
+        this.data = data;
         this._subtype = subtype;
     }
 
