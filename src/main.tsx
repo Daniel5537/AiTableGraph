@@ -8,6 +8,9 @@ import {DecathlonLinkSheetVisualGraph} from "./graphic/enhancedGraphLayout/Decat
 import {AiTableLinkSheet} from "./applications/AiTableLinkSheet";
 
 ReactDOM.render(
-    <AiTableLinkSheet/>,
+    <div>
+        <AiTableLinkSheet/>
+    </div>,
+
     document.getElementById("root")
 );

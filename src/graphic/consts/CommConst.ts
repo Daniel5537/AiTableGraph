@@ -18,4 +18,9 @@ export class CommConst {
     public static readonly DEFAULT_MOUSE_STATUS: string = "defaultMouseStatus";
     public static readonly STEP_HEADER_RESZIE_MOUSE_STATUS: string = "stepHeaderResizeMouseStatus";
     public static readonly STEP_MIN_WIDTH: number = 120;
+
+    public static readonly NODE_TYPE_BASE_SHEET: string = "nodeTypeBaseSheet";
+    public static readonly NODE_TYPE_LINK_SHEET: string = "nodeTypeLinkSheet";
+
+    public static readonly NODE_STATUS: string = "nodeStatus";
 }

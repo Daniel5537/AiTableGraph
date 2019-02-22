@@ -4,3 +4,10 @@
   //left: 50%;
   transform: translateX(50%) translateY(50%);
 }
+.labelCenter {
+  -webkit-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
+  user-select:none;
+  transform: translateX(50%) translateY(50%);
+}

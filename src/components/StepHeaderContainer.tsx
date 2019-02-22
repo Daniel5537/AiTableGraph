@@ -49,7 +49,7 @@ export class StepHeaderContainer extends DecathlonComponent {
 
         return (
             <div style={this.state[CommConst.STYLE_OBJECT]} className={"stepHeaderContainer"}>
-                <p className={"position-center"}>{this.state[CommConst.STEP_NAME]}</p>
+                <p className="labelCenter">{this.state[CommConst.STEP_NAME]}</p>
                 <div className={"changeSzieBtn"} style={sizeBtnStyleObj}
                      onMouseOver={this.onSizeChangeBtnMouseOverHandler}
                      onMouseOut={this.onSizeChangeBtnMouseOutHandler}

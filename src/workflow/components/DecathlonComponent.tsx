@@ -331,23 +331,27 @@ export class DecathlonComponent extends React.Component<IDecathlonComponentProps
     componentWillMount() {
         this._styleObj = {};
         if (this.props.zIndex)
-            this._styleObj["zIndex"] = this.props.zIndex;
+            this._zIndex = this._styleObj["zIndex"] = this.props.zIndex;
         if (this.props.id)
             this._id = this.props.id;
         if (this.props.x)
-            this._styleObj["left"] = this.props.x;
+            this._x = this._styleObj["left"] = this.props.x;
         if (this.props.y)
-            this._styleObj["top"] = this.props.y;
+            this._y = this._styleObj["top"] = this.props.y;
         if (this.props.position)
-            this._styleObj["position"] = this.props.position;
-        if (this.props.percentWidth)
+            this._position = this._styleObj["position"] = this.props.position;
+        if (this.props.percentWidth) {
+            this._percentWidth = this.props.percentWidth;
             this._styleObj["width"] = this.props.percentWidth + "%";
+        }
         if (this.props.width)
             this._width = this._styleObj["width"] = this.props.width;
-        if (this.props.percentHeight)
+        if (this.props.percentHeight) {
+            this._percentHeight = this.props.percentHeight;
             this._styleObj["height"] = this.props.percentHeight + "%";
+        }
         if (this.props.height)
-            this._styleObj["height"] = this.props.height;
+            this._height = this._styleObj["height"] = this.props.height;
         if (this.props.backgroundColor)
             this._styleObj["backgroundColor"] = this.props.backgroundColor;
         if (this.props.data)

@@ -5,7 +5,6 @@ import {IEventDispatcher} from "../../../workflow/events/IEventDispatcher";
 
 export interface IGraph extends IEventDispatcher {
     id: string;
-    xmlData: XMLDocument;
     nodes: Array<INode>;
     edges: Array<IEdge>;
     noNodes: number;
@@ -16,8 +15,6 @@ export interface IGraph extends IEventDispatcher {
     nodeByStringId(sid: string, caseSensitive: boolean): INode;
 
     nodeById(id: number): INode;
-
-    initFromXML(xml: XMLDocument): void;
 
     createNode(sid: string, o: object): INode;
 
